@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronTrack Ultra - Master Edition</title>
+    <title>IronTrack Ultra - Architect</title>
     <style>
         :root {
             --bg: #0f0f0f; --card: #1a1a1a; --text: #ffffff;
@@ -13,59 +13,43 @@
             --bg: #f0f2f5; --card: #ffffff; --text: #1a1a1a;
             --primary: #00b361; --accent: #e4e6eb; --rest: #2980b9; --fuel: #d4ac0d; --danger: #d32f2f;
         }
-        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; transition: 0.3s; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; }
         .container { width: 100%; max-width: 500px; margin: auto; padding: 15px; box-sizing: border-box; }
         
-        /* NAVIGATION */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
-            background: rgba(26, 26, 26, 0.95); backdrop-filter: blur(10px);
-            border-top: 1px solid var(--accent); display: flex; justify-content: space-around; align-items: center; z-index: 1000;
-        }
-        .nav-item { background: none; border: none; color: #666; font-size: 0.65rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.2s; }
-        .nav-item.active { color: var(--primary); transform: translateY(-3px); }
-        .nav-icon { font-size: 1.4rem; margin-bottom: 4px; }
-
-        /* PAGE MANAGEMENT */
-        .page { display: none; animation: slideIn 0.3s ease-out; }
+        /* PAGE & NAV */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: rgba(26,26,26,0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--accent); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+        .nav-item { background: none; border: none; color: #666; font-size: 0.65rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .nav-item.active { color: var(--primary); }
+        .page { display: none; animation: slide 0.3s ease; }
         .page.active { display: block; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slide { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; } }
 
-        /* CARDS & UI */
-        .card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 15px; border: 1px solid var(--accent); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -1px; }
-        h3 { color: var(--primary); font-size: 0.75rem; text-transform: uppercase; margin-top: 0; letter-spacing: 1px; }
+        /* CARDS */
+        .card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 15px; border: 1px solid var(--accent); }
+        h2 { font-size: 1.8rem; font-weight: 800; margin: 10px 0; }
+        h3 { color: var(--primary); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 10px; }
 
-        /* VIDEO PLACEHOLDERS */
-        .video-container {
-            width: 100%; aspect-ratio: 16 / 9; background: #222; border-radius: 12px; 
-            margin-bottom: 12px; display: flex; align-items: center; justify-content: center;
-            position: relative; overflow: hidden; border: 1px solid #333;
-        }
-        .video-container::after {
-            content: '▶'; color: var(--primary); font-size: 2rem; opacity: 0.6;
-            background: rgba(0,0,0,0.4); width: 60px; height: 60px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; padding-left: 5px;
-        }
-        .video-container.demo-anim {
-            background: linear-gradient(45deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
-            background-size: 200% 200%; animation: shimmer 3s infinite linear;
-        }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        /* INPUTS */
+        input, select { width: 100%; padding: 14px; margin-bottom: 12px; background: var(--accent); border: none; border-radius: 12px; color: var(--text); font-size: 1rem; box-sizing: border-box;}
+        .btn-main { width: 100%; padding: 15px; background: var(--primary); color: #000; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .btn-outline { background: none; border: 1px solid var(--accent); color: var(--text); padding: 10px; border-radius: 10px; cursor: pointer; flex: 1; font-size: 0.8rem; }
+        .btn-outline.active { border-color: var(--primary); color: var(--primary); background: rgba(0,255,136,0.05); }
 
-        /* CALENDAR */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
-        .day { position: relative; padding: 14px 0; font-size: 0.8rem; border-radius: 10px; background: var(--accent); cursor: pointer; text-align: center; transition: 0.2s; }
-        .day.selected { background: var(--primary); color: #000; font-weight: bold; }
-        .fuel-bar { position: absolute; left: 0; bottom: 0; width: 0%; height: 4px; background: var(--fuel); border-radius: 0 0 10px 10px; transition: 0.3s; }
-
-        /* INPUTS & BUTTONS */
-        input { width: 100%; padding: 14px; margin-bottom: 12px; background: var(--accent); border: none; border-radius: 12px; color: var(--text); font-size: 1rem; box-sizing: border-box;}
-        .btn-main { width: 100%; padding: 15px; background: var(--primary); color: #000; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-danger { background: none; color: var(--danger); border: none; cursor: pointer; font-weight: bold; }
+        /* TIMER CONSOLE */
+        .timer-console { background: #000; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--rest); margin-bottom: 15px; }
+        .timer-display { font-size: 2.5rem; font-weight: 900; color: var(--rest); font-variant-numeric: tabular-nums; }
         
-        #timer-display { text-align: center; font-size: 2.2rem; font-weight: 900; color: var(--rest); margin-bottom: 10px; }
-        .muscle-tag { background: rgba(0, 255, 136, 0.1); color: var(--primary); font-size: 0.65rem; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
+        /* DOTS */
+        .dot-container { display: flex; justify-content: center; gap: 6px; margin: 10px 0; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #333; }
+        .dot.active { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
+
+        /* UTILS */
+        .video-placeholder { width: 100%; aspect-ratio: 16/9; background: #222; border-radius: 12px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 1px solid #333; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .day { padding: 12px 0; text-align: center; background: var(--accent); border-radius: 8px; font-size: 0.8rem; position: relative; cursor: pointer; }
+        .day.selected { background: var(--primary); color: #000; font-weight: bold; }
+        .fuel-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: var(--fuel); border-radius: 0 0 8px 8px; }
     </style>
 </head>
 <body data-theme="dark">
@@ -73,246 +57,260 @@
 <div class="container">
     
     <section id="page-today" class="page active">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2>Today</h2>
-            <button onclick="toggleTheme()" style="background:var(--accent); border:none; color:var(--text); padding:8px; border-radius:12px; cursor:pointer;">🌓</button>
-        </div>
-        
+        <h2>Today</h2>
+
         <div class="card">
-            <h3>Daily Fuel</h3>
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="cal-input" placeholder="Calories consumed">
-                <button onclick="saveCals()" class="btn-main" style="width: 80px; padding:0;">Save</button>
+            <h3>Choose Focus</h3>
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <button class="btn-outline" onclick="buildRoutine('Arms', this)">Arms</button>
+                <button class="btn-outline" onclick="buildRoutine('Legs', this)">Legs</button>
+                <button class="btn-outline" onclick="buildRoutine('Back', this)">Back</button>
+                <button class="btn-outline" onclick="buildRoutine('Core', this)">Core</button>
+            </div>
+            <p id="routine-desc" style="font-size:0.75rem; color:#888; margin:0;">Choose a focus to generate a 3-5 exercise routine.</p>
+        </div>
+
+        <div class="timer-console">
+            <h3>Cooldown Console</h3>
+            <div class="timer-display" id="timer-val">01:30</div>
+            <div style="display:flex; gap:10px; justify-content: center; margin-top:10px;">
+                <button class="btn-outline" onclick="adjustTimer(-30)">-30s</button>
+                <button class="btn-main" style="width:100px; padding:10px;" id="timer-toggle" onclick="toggleTimer()">START</button>
+                <button class="btn-outline" onclick="adjustTimer(30)">+30s</button>
             </div>
         </div>
 
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3>Active Workout</h3>
-                <div id="timer-display" style="margin:0; font-size: 1.2rem;">00:00</div>
-            </div>
-            
-            <input list="ex-lib" id="ex-name" placeholder="Search Exercise...">
+            <h3>Set Tracker</h3>
+            <input list="ex-lib" id="ex-name" placeholder="Exercise Name">
             <datalist id="ex-lib"></datalist>
             
             <div style="display:flex; gap:10px;">
                 <input type="number" id="ex-sets" placeholder="Sets" oninput="updateDots()">
                 <input type="number" id="ex-reps" placeholder="Reps">
             </div>
-
-            <div id="set-dots" style="display:flex; justify-content:center; gap:8px; margin-bottom:15px;"></div>
-            <button id="set-btn" class="btn-main" onclick="completeSet()">Start Session</button>
+            <div class="dot-container" id="dot-container"></div>
+            <button id="set-btn" class="btn-main" onclick="logSet()">Log Set 1</button>
         </div>
 
-        <div id="today-history"></div>
+        <div id="today-logs"></div>
     </section>
 
     <section id="page-history" class="page">
         <h2>History</h2>
         <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <button onclick="changeMonth(-1)" style="color:var(--text); background:none; border:none; font-size:1.2rem;">◀</button>
-                <h4 id="month-display" style="margin:0;"></h4>
-                <button onclick="changeMonth(1)" style="color:var(--text); background:none; border:none; font-size:1.2rem;">▶</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <button onclick="changeMonth(-1)" style="color:var(--text); background:none; border:none; font-size:1.5rem;">◀</button>
+                <h4 id="month-name" style="margin:0;"></h4>
+                <button onclick="changeMonth(1)" style="color:var(--text); background:none; border:none; font-size:1.5rem;">▶</button>
             </div>
-            <div class="calendar-grid" id="calendar-days"></div>
+            <div class="calendar-grid" id="calendar"></div>
         </div>
-        <div id="history-detail-list"></div>
+        <div class="card">
+            <h3>Fuel Log</h3>
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="cal-input" placeholder="Add Calories">
+                <button onclick="saveCals()" class="btn-main" style="width:80px; padding:0;">Save</button>
+            </div>
+        </div>
+        <div id="history-details"></div>
     </section>
 
     <section id="page-lib" class="page">
         <h2>Encyclopedia</h2>
-        <input type="text" id="lib-search" placeholder="Search muscles or movements..." oninput="renderLibrary()">
-        <div id="library-container"></div>
+        <input type="text" id="lib-search" placeholder="Search movements..." oninput="renderLibrary()">
+        <div id="lib-list"></div>
     </section>
-
 </div>
 
 <nav class="bottom-nav">
-    <button class="nav-item active" onclick="showPage('today', this)">
-        <span class="nav-icon">⚡</span>Today
-    </button>
-    <button class="nav-item" onclick="showPage('history', this)">
-        <span class="nav-icon">📅</span>History
-    </button>
-    <button class="nav-item" onclick="showPage('lib', this)">
-        <span class="nav-icon">📚</span>Library
-    </button>
+    <button class="nav-item active" onclick="showPage('today', this)"><span style="font-size:1.5rem">⚡</span>Today</button>
+    <button class="nav-item" onclick="showPage('history', this)"><span style="font-size:1.5rem">📅</span>History</button>
+    <button class="nav-item" onclick="showPage('lib', this)"><span style="font-size:1.5rem">📚</span>Library</button>
 </nav>
 
 <script>
-    let currentViewDate = new Date();
+    let currentSet = 1, timerSec = 90, timerRunning = false, timerInt;
     let selectedDate = new Date().toLocaleDateString();
-    let currentSet = 1;
-    let timerInt;
-    const CAL_GOAL = 2500;
+    let viewDate = new Date();
 
-    const exerciseEncyclopedia = [
-        { name: "Pushups", target: "Chest", info: "Elbows at 45 degrees. Body in a straight line.", icon: "💪" },
-        { name: "Pullups", target: "Back", info: "Full extension at bottom. Chin over bar at top.", icon: "🦇" },
-        { name: "Squats", target: "Legs", info: "Sit back into heels. Keep chest upright.", icon: "🦵" },
-        { name: "Plank", target: "Core", info: "Forearms on ground. Squeeze glutes and abs.", icon: "🛡️" },
-        { name: "Dips", target: "Triceps", info: "Tuck elbows. Lower until arms are parallel.", icon: "⚡" },
-        { name: "Leg Raises", target: "Abs", info: "Don't let feet touch floor between reps.", icon: "🔥" }
+    const db = [
+        { name: "Diamond Pushups", muscle: "Arms", info: "Focus on triceps." },
+        { name: "Dips", muscle: "Arms", info: "Keep chest upright." },
+        { name: "Chin-ups", muscle: "Arms", info: "Palm facing you." },
+        { name: "Squats", muscle: "Legs", info: "Deep range of motion." },
+        { name: "Lunges", muscle: "Legs", info: "Keep torso vertical." },
+        { name: "Bulgarian Split Squats", muscle: "Legs", info: "Elevate back foot." },
+        { name: "Pullups", muscle: "Back", info: "Wide grip for lats." },
+        { name: "Inverted Rows", muscle: "Back", info: "Pull chest to bar." },
+        { name: "Superman", muscle: "Back", info: "Focus on lower back." },
+        { name: "Plank", muscle: "Core", info: "Keep body perfectly flat." },
+        { name: "Hanging Leg Raises", muscle: "Core", info: "Don't swing." },
+        { name: "Bicycle Crunches", muscle: "Core", info: "Touch elbow to knee." }
     ];
 
-    function playDing() {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const g = ctx.createGain();
-            osc.type="sine"; osc.frequency.setValueAtTime(880, ctx.currentTime);
-            g.gain.setValueAtTime(0, ctx.currentTime);
-            g.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.05);
-            g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
-            osc.connect(g); g.connect(ctx.destination);
-            osc.start(); osc.stop(ctx.currentTime + 0.8);
-        } catch(e) {}
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('ex-lib').innerHTML = exerciseEncyclopedia.map(ex => `<option value="${ex.name}">`).join('');
-        if(localStorage.getItem('theme')) document.body.setAttribute('data-theme', localStorage.getItem('theme'));
-        renderAll();
-    });
-
-    function showPage(pageId, btn) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-        document.getElementById('page-' + pageId).classList.add('active');
+    function showPage(p, btn) {
+        document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(nv => nv.classList.remove('active'));
+        document.getElementById('page-'+p).classList.add('active');
         btn.classList.add('active');
-        if(pageId === 'lib') renderLibrary();
         renderAll();
     }
 
-    // --- TRACKING ---
-    function updateDots() {
-        const target = parseInt(document.getElementById('ex-sets').value) || 0;
-        const container = document.getElementById('set-dots');
-        container.innerHTML = Array.from({length:target}, (_,i) => {
-            const bg = i < currentSet-1 ? 'var(--primary)' : '#444';
-            return `<div style="width:12px; height:12px; border-radius:50%; background:${bg}"></div>`;
-        }).join('');
-        document.getElementById('set-btn').innerText = (currentSet >= target && target > 0) ? "Finish Exercise" : `Complete Set ${currentSet}`;
+    // --- ROUTINE BUILDER ---
+    function buildRoutine(focus, btn) {
+        document.querySelectorAll('.btn-outline').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const options = db.filter(ex => ex.muscle === focus);
+        const shuffled = options.sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, Math.floor(Math.random() * 2) + 3); // 3-4 exercises
+        
+        document.getElementById('routine-desc').innerHTML = `<strong>Today's ${focus} Routine:</strong><br>` + 
+            selected.map(s => `• ${s.name}`).join('<br>');
+        
+        // Auto-fill the first exercise
+        document.getElementById('ex-name').value = selected[0].name;
+        document.getElementById('ex-sets').value = 3;
+        document.getElementById('ex-reps').value = 10;
+        updateDots();
     }
 
-    function completeSet() {
-        const name = document.getElementById('ex-name').value;
-        const target = parseInt(document.getElementById('ex-sets').value);
-        const reps = document.getElementById('ex-reps').value;
-        if(!name || !target || !reps) return;
-
-        if(currentSet >= target) {
-            saveLog(name, target, reps);
-            resetTracker();
-            startTimer(90); // Cooldown
+    // --- COOLDOWN TIMER ---
+    function toggleTimer() {
+        if(timerRunning) {
+            clearInterval(timerInt);
+            document.getElementById('timer-toggle').innerText = "START";
         } else {
+            timerInt = setInterval(() => {
+                timerSec--;
+                updateTimerDisplay();
+                if(timerSec <= 0) {
+                    clearInterval(timerInt);
+                    playDing();
+                    timerRunning = false;
+                    document.getElementById('timer-toggle').innerText = "START";
+                }
+            }, 1000);
+            document.getElementById('timer-toggle').innerText = "STOP";
+        }
+        timerRunning = !timerRunning;
+    }
+
+    function adjustTimer(amt) {
+        timerSec = Math.max(0, timerSec + amt);
+        updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+        let m = Math.floor(timerSec/60), s = timerSec%60;
+        document.getElementById('timer-val').innerText = `${m}:${s<10?'0'+s:s}`;
+    }
+
+    function playDing() {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 1);
+    }
+
+    // --- TRACKER ---
+    function updateDots() {
+        const s = parseInt(document.getElementById('ex-sets').value) || 0;
+        const container = document.getElementById('dot-container');
+        container.innerHTML = Array.from({length:s}, (_,i) => `<div class="dot ${i < currentSet-1 ? 'active' : ''}"></div>`).join('');
+        document.getElementById('set-btn').innerText = (currentSet > s && s > 0) ? "Finish Exercise" : `Log Set ${currentSet}`;
+    }
+
+    function logSet() {
+        const sets = parseInt(document.getElementById('ex-sets').value);
+        if(currentSet < sets) {
             currentSet++;
             updateDots();
-            startTimer(60); // Rest
+        } else {
+            saveWorkout();
+            resetTracker();
         }
     }
 
-    function saveLog(name, sets, reps) {
+    function saveWorkout() {
+        const name = document.getElementById('ex-name').value;
+        const sets = document.getElementById('ex-sets').value;
+        const reps = document.getElementById('ex-reps').value;
         const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        logs.push({ id: Date.now(), date: new Date().toLocaleDateString(), name, sets, reps, vol: sets * reps });
+        logs.push({ id: Date.now(), date: new Date().toLocaleDateString(), name, sets, reps, vol: sets*reps });
         localStorage.setItem('ultraLogs', JSON.stringify(logs));
         renderAll();
     }
 
-    function startTimer(sec) {
-        clearInterval(timerInt);
-        let t = sec;
-        timerInt = setInterval(() => {
-            let m = Math.floor(t/60); let s = t%60;
-            document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-            if(t-- <= 0) { clearInterval(timerInt); playDing(); document.getElementById('timer-display').innerText = "GO!"; }
-        }, 1000);
-    }
-
     function resetTracker() {
-        currentSet = 1; document.getElementById('ex-name').value = ''; document.getElementById('ex-sets').value = ''; document.getElementById('ex-reps').value = '';
+        currentSet = 1; document.getElementById('ex-name').value = '';
+        document.getElementById('ex-sets').value = ''; document.getElementById('ex-reps').value = '';
         updateDots();
     }
 
-    // --- HISTORY/CALENDAR ---
+    // --- DATA ---
     function renderCalendar() {
-        const grid = document.getElementById('calendar-days');
-        document.getElementById('month-display').innerText = `${currentViewDate.toLocaleString('default', { month: 'long' })} ${currentViewDate.getFullYear()}`;
-        const lastDay = new Date(currentViewDate.getFullYear(), currentViewDate.getMonth() + 1, 0).getDate();
+        const grid = document.getElementById('calendar');
+        document.getElementById('month-name').innerText = viewDate.toLocaleString('default', {month:'long', year:'numeric'});
+        const last = new Date(viewDate.getFullYear(), viewDate.getMonth()+1, 0).getDate();
         const cals = JSON.parse(localStorage.getItem('nutriLogs') || '{}');
-        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-
-        grid.innerHTML = "";
-        for (let i = 1; i <= lastDay; i++) {
-            const dStr = new Date(currentViewDate.getFullYear(), currentViewDate.getMonth(), i).toLocaleDateString();
-            const dayCals = parseInt(cals[dStr] || 0);
-            const hasData = logs.some(l => l.date === dStr);
-            
+        
+        grid.innerHTML = '';
+        for(let i=1; i<=last; i++) {
+            const d = new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString();
             const dayEl = document.createElement('div');
-            dayEl.className = `day ${dStr === selectedDate ? 'selected' : ''}`;
-            if(hasData && dStr !== selectedDate) dayEl.style.borderColor = "var(--primary)";
-            
-            const fuelWidth = Math.min((dayCals / CAL_GOAL) * 100, 100);
-            dayEl.innerHTML = `${i} <div class="fuel-bar" style="width:${fuelWidth}%; opacity:${fuelWidth > 0 ? 1 : 0}"></div>`;
-            dayEl.onclick = () => { selectedDate = dStr; renderAll(); };
+            dayEl.className = `day ${d === selectedDate ? 'selected' : ''}`;
+            const fuel = Math.min((parseInt(cals[d]||0)/2500)*100, 100);
+            dayEl.innerHTML = `${i} <div class="fuel-bar" style="width:${fuel}%"></div>`;
+            dayEl.onclick = () => { selectedDate = d; renderAll(); };
             grid.appendChild(dayEl);
         }
     }
 
-    function renderWorkouts() {
+    function renderHistory() {
         const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
         const filtered = logs.filter(l => l.date === selectedDate);
-        const html = filtered.map(w => `
+        const html = filtered.map(l => `
             <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                <div><strong>${w.name}</strong><br><small style="color:#888">${w.sets} sets × ${w.reps} reps</small></div>
-                <button onclick="deleteLog(${w.id})" class="btn-danger">✕</button>
+                <div><strong>${l.name}</strong><br><small>${l.sets}x${l.reps}</small></div>
+                <button onclick="deleteLog(${l.id})" style="color:var(--danger); background:none; border:none;">✕</button>
             </div>
         `).join('');
-        document.getElementById('history-detail-list').innerHTML = `<h3>Activity for ${selectedDate}</h3>` + (html || "<p style='color:#666'>Rest Day / No Logs</p>");
-        if(selectedDate === new Date().toLocaleDateString()) document.getElementById('today-history').innerHTML = `<h3>Logged Today</h3>` + html;
+        document.getElementById('history-details').innerHTML = `<h3>${selectedDate}</h3>` + (html || '<p style="font-size:0.8rem; color:#666;">No activity logged.</p>');
+        if(selectedDate === new Date().toLocaleDateString()) document.getElementById('today-logs').innerHTML = `<h3>Logged Today</h3>` + html;
+    }
+
+    function renderLibrary() {
+        const q = document.getElementById('lib-search').value.toLowerCase();
+        document.getElementById('lib-list').innerHTML = db.filter(ex => ex.name.toLowerCase().includes(q) || ex.muscle.toLowerCase().includes(q)).map(ex => `
+            <div class="card">
+                <div class="video-placeholder">▶</div>
+                <div style="display:flex; justify-content:space-between;">
+                    <strong>${ex.name}</strong>
+                    <span style="color:var(--primary); font-size:0.7rem;">${ex.muscle}</span>
+                </div>
+                <p style="font-size:0.8rem; color:#888; margin-top:5px;">${ex.info}</p>
+            </div>
+        `).join('');
     }
 
     function deleteLog(id) {
-        let logs = JSON.parse(localStorage.getItem('ultraLogs'));
-        localStorage.setItem('ultraLogs', JSON.stringify(logs.filter(l => l.id !== id)));
-        renderAll();
+        let logs = JSON.parse(localStorage.getItem('ultraLogs')).filter(l => l.id !== id);
+        localStorage.setItem('ultraLogs', JSON.stringify(logs)); renderAll();
     }
-
     function saveCals() {
         const c = JSON.parse(localStorage.getItem('nutriLogs') || '{}');
-        c[new Date().toLocaleDateString()] = document.getElementById('cal-input').value;
-        localStorage.setItem('nutriLogs', JSON.stringify(c)); 
-        renderAll();
+        c[selectedDate] = document.getElementById('cal-input').value;
+        localStorage.setItem('nutriLogs', JSON.stringify(c)); renderAll();
     }
-
-    function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); }
-
-    // --- ENCYCLOPEDIA ---
-    function renderLibrary() {
-        const query = document.getElementById('lib-search').value.toLowerCase();
-        const container = document.getElementById('library-container');
-        const filtered = exerciseEncyclopedia.filter(ex => 
-            ex.name.toLowerCase().includes(query) || ex.target.toLowerCase().includes(query)
-        );
-        container.innerHTML = filtered.map(ex => `
-            <div class="card" style="padding: 12px;">
-                <div class="video-container demo-anim"></div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <strong style="font-size:1.1rem;">${ex.icon} ${ex.name}</strong>
-                    <span class="muscle-tag">${ex.target}</span>
-                </div>
-                <p style="font-size:0.85rem; color:#aaa; margin:0; line-height:1.4;">${ex.info}</p>
-            </div>
-        `).join('');
-    }
-
-    function toggleTheme() {
-        const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        document.body.setAttribute('data-theme', t); localStorage.setItem('theme', t);
-    }
-
-    function renderAll() { renderCalendar(); renderWorkouts(); }
+    function changeMonth(dir) { viewDate.setMonth(viewDate.getMonth()+dir); renderCalendar(); }
+    function renderAll() { renderCalendar(); renderHistory(); renderLibrary(); }
+    
+    document.getElementById('ex-lib').innerHTML = db.map(ex => `<option value="${ex.name}">`).join('');
+    renderAll();
 </script>
 </body>
 </html>

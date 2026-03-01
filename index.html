@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronBot: Protocol Edition</title>
+    <title>IronBot: Evolution</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,294 +11,230 @@
             --primary: #58a6ff; --bot-glow: #00ffcc; --rest: #79c0ff;
             --danger: #ff7b72; --bright-green: #39d353; --fuel: #f1c40f;
         }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 120px; overflow-x: hidden; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 120px; }
         .container { width: 100%; max-width: 450px; margin: auto; padding: 20px; box-sizing: border-box; }
 
-        /* --- THE ROBOT --- */
-        .bot-container { height: 180px; display: flex; justify-content: center; align-items: center; position: relative; margin-top: 10px; }
-        .bot { width: 90px; height: 90px; background: #30363d; border: 4px solid var(--bot-glow); border-radius: 28px; position: relative; animation: float 3s ease-in-out infinite; box-shadow: 0 0 20px rgba(0,255,204,0.2); transition: 0.5s; }
-        .bot-eyes { display: flex; justify-content: space-around; width: 50px; margin: 25px auto; }
-        .eye { width: 10px; height: 10px; background: var(--bot-glow); border-radius: 50%; box-shadow: 0 0 10px var(--bot-glow); transition: 0.3s; }
-        .bot.resting { border-color: var(--rest); animation: sleep 4s ease-in-out infinite; }
-        .bot.resting .eye { height: 2px; margin-top: 4px; background: var(--rest); box-shadow: 0 0 5px var(--rest); }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-        @keyframes sleep { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(0.95); opacity: 1; } }
-        .bot-speech { position: absolute; top: 0; right: 5%; background: white; color: black; padding: 8px 12px; border-radius: 18px 18px 18px 0; font-size: 0.7rem; font-weight: 900; max-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10; }
+        /* --- THE NEW IRONBOT --- */
+        .bot-scene { height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .bot-body { width: 80px; height: 80px; background: #30363d; border: 4px solid var(--bot-glow); border-radius: 25px; position: relative; animation: float 3s infinite ease-in-out; box-shadow: 0 0 20px rgba(0,255,204,0.2); }
+        
+        /* Arms */
+        .arm { width: 15px; height: 40px; background: #30363d; border: 3px solid var(--bot-glow); position: absolute; border-radius: 10px; top: 20px; transition: 0.3s; }
+        .arm-l { left: -25px; transform-origin: top right; transform: rotate(10deg); }
+        .arm-r { right: -25px; transform-origin: top left; transform: rotate(-10deg); }
+        
+        /* Face */
+        .eyes { display: flex; justify-content: space-around; width: 40px; margin: 20px auto 5px; }
+        .eye { width: 10px; height: 10px; background: var(--bot-glow); border-radius: 50%; box-shadow: 0 0 10px var(--bot-glow); }
+        .mouth { width: 20px; height: 4px; background: var(--bot-glow); margin: 5px auto; border-radius: 10px; box-shadow: 0 0 5px var(--bot-glow); transition: 0.3s; }
 
-        /* --- UI CARDS --- */
-        .glass-card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08); }
-        h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 12px; }
-        
-        /* DAILY MISSION */
-        .mission-item { display: flex; align-items: center; background: #0d1117; padding: 10px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid #333; transition: 0.3s; }
-        .mission-item.done { border-left-color: var(--bright-green); opacity: 0.6; }
-        .check-btn { margin-right: 12px; width: 20px; height: 20px; border-radius: 6px; border: 2px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; }
-        .mission-item.done .check-btn { background: var(--bright-green); border-color: var(--bright-green); color: black; }
+        /* Animations */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .working .arm-l { transform: rotate(140deg); }
+        .working .arm-r { transform: rotate(-140deg); }
+        .working .mouth { height: 10px; width: 10px; border-radius: 50%; }
+        .resting .eye { height: 2px; }
+        .resting .mouth { width: 10px; opacity: 0.5; }
 
-        /* TIMER & LOGS */
-        .timer-display { font-size: 3.5rem; font-weight: 900; color: var(--rest); text-align: center; font-family: monospace; margin: 10px 0; }
-        .btn-cyber { width: 100%; padding: 14px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-family: 'Outfit'; font-size: 0.8rem; }
-        .btn-primary { background: var(--primary); color: white; margin-top: 10px; }
-        .btn-sync { background: var(--bot-glow); color: black; padding: 6px 10px; border-radius: 8px; font-size: 0.6rem; float: right; font-weight: 900; border: none; cursor: pointer; }
-        
-        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px; font-family: 'Outfit'; }
-        
-        .nav-bar { position: fixed; bottom: 20px; left: 15px; right: 15px; background: rgba(22, 27, 34, 0.96); border-radius: 28px; height: 75px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 1000; }
-        .nav-item { color: #8b949e; background: none; border: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; font-weight: 600; }
+        /* XP BAR */
+        .xp-container { width: 150px; height: 8px; background: #111; border-radius: 10px; margin-top: 15px; overflow: hidden; border: 1px solid #333; }
+        #xp-bar { width: 30%; height: 100%; background: linear-gradient(90deg, var(--bot-glow), var(--primary)); transition: 1s; }
+
+        /* --- UI COMPONENTS --- */
+        .glass-card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.08); }
+        .debrief-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .debrief-card { background: rgba(88,166,255,0.05); border: 1px solid rgba(88,166,255,0.1); border-radius: 18px; padding: 12px; text-align: center; }
+        .debrief-card label { font-size: 0.55rem; color: var(--primary); display: block; font-weight: 800; }
+        .debrief-card span { font-size: 1rem; font-weight: 900; }
+
+        input, select { background: #0d1117; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px; font-family: 'Outfit'; }
+        .btn-cyber { padding: 14px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-family: 'Outfit'; width: 100%; }
+        .nav-bar { position: fixed; bottom: 20px; left: 10px; right: 10px; background: #161b22; border-radius: 30px; height: 70px; display: flex; justify-content: space-around; align-items: center; border: 1px solid #333; }
+        .nav-item { color: #8b949e; background: none; border: none; font-size: 0.65rem; display: flex; flex-direction: column; align-items: center; }
         .nav-item.active { color: var(--bot-glow); }
-
-        .lib-card { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
-        .video-placeholder { width: 100%; height: 140px; background: #000; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; border: 1px solid var(--primary); font-size: 0.6rem; color: var(--primary); letter-spacing: 2px; }
-        
-        .page { display: none; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .page { display: none; } .page.active { display: block; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    
     <section id="page-today" class="page active">
-        <div class="bot-container">
-            <div id="iron-bot" class="bot"><div class="bot-eyes"><div class="eye"></div><div class="eye"></div></div></div>
-            <div class="bot-speech" id="bot-message">HELLO! READY FOR TODAY'S MISSION?</div>
-        </div>
-
-        <div class="glass-card">
-            <h3>Daily Protocol</h3>
-            <div id="mission-list"></div>
-        </div>
-
-        <div class="glass-card">
-            <h3>Cooldown Timer</h3>
-            <div class="timer-display" id="timer-display">01:30</div>
-            <button id="timer-btn" class="btn-cyber" style="background:var(--rest); color:white" onclick="toggleTimer()">Activate Rest</button>
-        </div>
-
-        <div class="glass-card">
-            <h3>Log Activity</h3>
-            <input id="ex-name" placeholder="Exercise Name">
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="ex-sets" placeholder="Sets">
-                <input type="number" id="ex-reps" placeholder="Reps">
+        <div class="bot-scene" id="bot-scene">
+            <div class="bot-body" id="iron-bot">
+                <div class="arm arm-l"></div>
+                <div class="arm arm-r"></div>
+                <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+                <div class="mouth"></div>
             </div>
-            <button class="btn-cyber btn-primary" onclick="handleLog()">Upload to History</button>
+            <div class="xp-container"><div id="xp-bar"></div></div>
+            <div style="font-size: 0.6rem; margin-top: 5px; font-weight: 800; color: var(--bot-glow);">LVL <span id="bot-lvl">1</span> BOT COMPANION</div>
         </div>
+
+        <div class="glass-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="timer-display" style="font-size: 2rem; color: var(--rest); margin:0;">01:30</h3>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn-cyber" style="width:40px; padding:5px; background:#333; color:white;" onclick="adjTimer(-30)">-</button>
+                    <button id="t-btn" class="btn-cyber" style="width:100px; padding:5px; background:var(--rest); color:white;" onclick="toggleTimer()">Rest</button>
+                    <button class="btn-cyber" style="width:40px; padding:5px; background:#333; color:white;" onclick="adjTimer(30)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <button id="m-w" class="btn-cyber" style="font-size:0.6rem; background:var(--card); color:var(--bot-glow)" onclick="setMode('w')">Lifting</button>
+                <button id="m-c" class="btn-cyber" style="font-size:0.6rem; background:none; color:#666" onclick="setMode('c')">Cardio</button>
+            </div>
+            <input id="ex-name" placeholder="Exercise Name">
+            <div id="w-inputs" style="display:flex; gap:10px;"><input type="number" id="ex-s" placeholder="Sets"><input type="number" id="ex-r" placeholder="Reps"></div>
+            <div id="c-inputs" style="display:none; gap:10px;"><input type="number" id="ex-t" placeholder="Min"><input type="number" id="ex-d" placeholder="Miles"></div>
+            <button class="btn-cyber" style="background:var(--primary); color:white;" onclick="logData()">Sync Session</button>
+        </div>
+    </section>
+
+    <section id="page-stats" class="page">
+        <h2>Intelligence Debrief</h2>
+        <div class="debrief-grid">
+            <div class="debrief-card"><label>Monthly Miles</label><span id="st-m">0.0</span></div>
+            <div class="debrief-card"><label>Total Reps</label><span id="st-v">0</span></div>
+            <div class="debrief-card"><label>Weight Delta</label><span id="st-d">--</span></div>
+            <div class="debrief-card"><label>Signature</label><span id="st-f" style="font-size:0.7rem;">--</span></div>
+        </div>
+        <div class="glass-card"><canvas id="wGraph" style="width:100%; height:120px;"></canvas></div>
+        <div id="hist-list"></div>
     </section>
 
     <section id="page-lib" class="page">
         <h2>Encyclopedia</h2>
-        <input type="text" id="lib-search" placeholder="Search movements..." oninput="renderLibrary()">
+        <input type="text" placeholder="Search..." oninput="renderLib(this.value)">
         <div id="lib-list"></div>
     </section>
 
-    <section id="page-history" class="page">
-        <h2>Analytics</h2>
+    <section id="page-set" class="page">
+        <h2>Calibration</h2>
         <div class="glass-card">
-            <h3 style="color:var(--bright-green)">Weight Trend</h3>
-            <canvas id="weightGraph" style="width:100%; height:120px;"></canvas>
-            <div style="display:flex; justify-content:space-around; margin-top:15px;">
-                <div style="text-align:center"><small>WEIGHT</small><br><strong id="cur-w">--</strong></div>
-                <div style="text-align:center"><small>CAL GOAL</small><br><strong id="cur-g" style="color:var(--fuel)">--</strong></div>
-            </div>
+            <label>Weight (lbs)</label><input type="number" id="set-w">
+            <label>Calorie Goal</label><input type="number" id="set-c">
+            <button class="btn-cyber" style="background:var(--primary); color:white;" onclick="saveSet()">Save</button>
         </div>
-        <div class="glass-card">
-            <h3>Update Vitals</h3>
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="vit-w" placeholder="Weight (lbs)">
-                <input type="number" id="vit-g" placeholder="Daily Cals">
-            </div>
-            <button class="btn-cyber btn-primary" onclick="updateVitals()">Save Changes</button>
-        </div>
-        <div id="history-details"></div>
     </section>
 </div>
 
 <nav class="nav-bar">
-    <button class="nav-item active" onclick="showPage('today', this)"><span>🤖</span>Today</button>
-    <button class="nav-item" onclick="showPage('lib', this)"><span>📚</span>Library</button>
-    <button class="nav-item" onclick="showPage('history', this)"><span>📊</span>Stats</button>
+    <button class="nav-item active" onclick="show('today', this)"><span>🤖</span>Today</button>
+    <button class="nav-item" onclick="show('stats', this)"><span>📊</span>Stats</button>
+    <button class="nav-item" onclick="show('lib', this)"><span>📚</span>Lib</button>
+    <button class="nav-item" onclick="show('set', this)"><span>⚙️</span>Set</button>
 </nav>
 
 <script>
-    const db = [
-        { name: "DB Bicep Curls", muscle: "Arms", info: "Focus on the squeeze at the top." },
-        { name: "Goblet Squats", muscle: "Legs", info: "Keep your heels glued to the floor." },
-        { name: "Shoulder Press", muscle: "Shoulders", info: "Don't arch your lower back." },
-        { name: "Push Ups", muscle: "Chest", info: "Keep your core tight and body straight." },
-        { name: "Plank", muscle: "Core", info: "Hold as long as possible with good form." },
-        { name: "Hammer Curls", muscle: "Arms", info: "Keep palms facing inward." }
+    const libDB = [
+        {n:"Bench Press", m:"Chest"}, {n:"Squats", m:"Legs"}, {n:"Deadlift", m:"Back"},
+        {n:"Bicep Curls", m:"Arms"}, {n:"Running", m:"Cardio"}, {n:"Cycling", m:"Cardio"}
     ];
+    let mode = 'w', tSec = 90, tRun = false, tInt;
 
-    let timerSec = 90, timerRunning = false, timerInt;
-    let missions = [];
-
-    // --- PROTOCOL (DAILY MISSION) LOGIC ---
-    function initDailyMission() {
-        const saved = JSON.parse(localStorage.getItem('ironBotMissions'));
-        const today = new Date().toLocaleDateString();
-        
-        if(saved && saved.date === today) {
-            missions = saved.data;
-        } else {
-            // Pick 3 random exercises
-            const shuffled = [...db].sort(() => 0.5 - Math.random());
-            missions = shuffled.slice(0, 3).map(ex => ({ name: ex.name, done: false }));
-            localStorage.setItem('ironBotMissions', JSON.stringify({ date: today, data: missions }));
-        }
-        renderMissions();
-    }
-
-    function renderMissions() {
-        const list = document.getElementById('mission-list');
-        list.innerHTML = missions.map((m, i) => `
-            <div class="mission-item ${m.done ? 'done' : ''}">
-                <div class="check-btn" onclick="toggleMission(${i})">${m.done ? '✓' : ''}</div>
-                <div style="font-size:0.85rem; font-weight:600;">${m.name}</div>
-            </div>
-        `).join('');
-        
-        const allDone = missions.every(m => m.done);
-        if(allDone) document.getElementById('bot-message').innerText = "MISSION ACCOMPLISHED! ALL SYSTEMS OPTIMIZED.";
-    }
-
-    function toggleMission(i) {
-        missions[i].done = !missions[i].done;
-        const today = new Date().toLocaleDateString();
-        localStorage.setItem('ironBotMissions', JSON.stringify({ date: today, data: missions }));
-        renderMissions();
-        if(missions[i].done) {
-            document.getElementById('iron-bot').classList.add('working');
-            setTimeout(() => document.getElementById('iron-bot').classList.remove('working'), 500);
-        }
-    }
-
-    // --- NAVIGATION & CORE ---
-    function showPage(p, btn) {
-        document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(ni => ni.classList.remove('active'));
+    function show(p, b) {
+        document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
         document.getElementById('page-'+p).classList.add('active');
-        btn.classList.add('active');
-        if(p === 'history') renderHistory();
-        if(p === 'lib') renderLibrary();
+        b.classList.add('active');
+        if(p==='stats') renderStats();
+        if(p==='lib') renderLib();
     }
 
+    function setMode(m) {
+        mode = m;
+        document.getElementById('w-inputs').style.display = m==='w'?'flex':'none';
+        document.getElementById('c-inputs').style.display = m==='c'?'flex':'none';
+        document.getElementById('m-w').style.color = m==='w'?'var(--bot-glow)':'#666';
+        document.getElementById('m-c').style.color = m==='c'?'var(--bot-glow)':'#666';
+    }
+
+    function adjTimer(v) { tSec = Math.max(0, tSec+v); updateT(); }
     function toggleTimer() {
-        const bot = document.getElementById('iron-bot');
-        const btn = document.getElementById('timer-btn');
-        if(timerRunning) {
-            clearInterval(timerInt);
-            timerRunning = false;
-            bot.classList.remove('resting');
-            btn.innerText = "Activate Rest";
-            btn.style.background = "var(--rest)";
-        } else {
-            timerRunning = true;
-            bot.classList.add('resting');
-            btn.innerText = "Stop Timer";
-            btn.style.background = "var(--danger)";
-            timerInt = setInterval(() => {
-                timerSec--;
-                updateTimerDisplay();
-                if(timerSec <= 0) {
-                    clearInterval(timerInt);
-                    timerRunning = false;
-                    bot.classList.remove('resting');
-                    btn.innerText = "Activate Rest";
-                    btn.style.background = "var(--rest)";
-                    timerSec = 90; updateTimerDisplay();
-                }
-            }, 1000);
+        const b = document.getElementById('bot-scene');
+        if(tRun) { clearInterval(tInt); tRun=false; b.classList.remove('resting'); }
+        else { 
+            tRun=true; b.classList.add('resting');
+            tInt = setInterval(() => { tSec--; updateT(); if(tSec<=0) toggleTimer(); }, 1000);
         }
     }
-
-    function updateTimerDisplay() {
-        let m = Math.floor(timerSec/60), s = timerSec%60;
+    function updateT() {
+        let m=Math.floor(tSec/60), s=tSec%60;
         document.getElementById('timer-display').innerText = `${m}:${s<10?'0'+s:s}`;
     }
 
-    function handleLog() {
-        const name = document.getElementById('ex-name').value;
-        const sets = document.getElementById('ex-sets').value;
-        const reps = document.getElementById('ex-reps').value;
-        if(!name) return;
+    function logData() {
+        const n = document.getElementById('ex-name').value; if(!n) return;
+        const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
+        const entry = {id:Date.now(), d:new Date().toLocaleDateString(), n, c:mode==='c'};
+        if(mode==='w') { entry.s=document.getElementById('ex-s').value; entry.r=document.getElementById('ex-r').value; }
+        else { entry.t=document.getElementById('ex-t').value; entry.m=document.getElementById('ex-d').value; }
+        logs.push(entry); localStorage.setItem('uLogs', JSON.stringify(logs));
         
-        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        logs.push({ id: Date.now(), date: new Date().toLocaleDateString(), name, sets, reps });
-        localStorage.setItem('ultraLogs', JSON.stringify(logs));
+        document.getElementById('bot-scene').classList.add('working');
+        setTimeout(()=> document.getElementById('bot-scene').classList.remove('working'), 1000);
+        updateXP();
+    }
+
+    function updateXP() {
+        const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
+        let total = logs.length * 20; // 20 XP per entry
+        let lvl = Math.floor(total / 100) + 1;
+        let prog = total % 100;
+        document.getElementById('xp-bar').style.width = prog + "%";
+        document.getElementById('bot-lvl').innerText = lvl;
+    }
+
+    function renderStats() {
+        const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
+        const vit = JSON.parse(localStorage.getItem('uVit')||'{}');
+        let miles = 0, reps = 0, counts = {};
         
-        document.getElementById('bot-message').innerText = "LOG RECEIVED. UPLOADING DATA...";
-        document.getElementById('ex-name').value = '';
-        document.getElementById('ex-sets').value = '';
-        document.getElementById('ex-reps').value = '';
-    }
-
-    function renderLibrary() {
-        const q = document.getElementById('lib-search').value.toLowerCase();
-        document.getElementById('lib-list').innerHTML = db.filter(ex => ex.name.toLowerCase().includes(q)).map(ex => `
-            <div class="lib-card">
-                <button class="btn-sync" onclick="syncToBot('${ex.name}')">SYNC</button>
-                <div class="video-placeholder">▶ ENCRYPTED VIDEO FEED</div>
-                <strong>${ex.name}</strong> <small style="color:var(--primary)">[${ex.muscle}]</small>
-                <p style="font-size:0.75rem; color:#8b949e; margin-top:8px;">${ex.info}</p>
-            </div>
-        `).join('');
-    }
-
-    function syncToBot(name) {
-        showPage('today', document.querySelector('.nav-item:first-child'));
-        document.getElementById('ex-name').value = name;
-        document.getElementById('bot-message').innerText = `READY FOR ${name.toUpperCase()}!`;
-    }
-
-    function updateVitals() {
-        const w = document.getElementById('vit-w').value;
-        const g = document.getElementById('vit-g').value;
-        if(w) {
-            const v = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
-            v[new Date().toLocaleDateString()] = { weight: w };
-            localStorage.setItem('ultraVitals', JSON.stringify(v));
-        }
-        if(g) localStorage.setItem('calGoal', g);
-        renderHistory();
-    }
-
-    function renderHistory() {
-        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        const vitals = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
-        const dates = Object.keys(vitals).sort((a,b) => new Date(b) - new Date(a));
-        document.getElementById('cur-w').innerText = dates.length ? vitals[dates[0]].weight + " lbs" : "--";
-        document.getElementById('cur-g').innerText = (localStorage.getItem('calGoal') || "2500") + " kcal";
-
-        document.getElementById('history-details').innerHTML = logs.reverse().map(l => `
-            <div class="glass-card" style="padding:15px; margin-bottom:10px;">
-                <strong>${l.name}</strong><br><small>${l.sets}x${l.reps} • ${l.date}</small>
-            </div>
-        `).join('');
-        renderGraph();
-    }
-
-    function renderGraph() {
-        const canvas = document.getElementById('weightGraph');
-        const ctx = canvas.getContext('2d');
-        const v = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
-        const data = Object.keys(v).map(d => ({ x: new Date(d), y: parseFloat(v[d].weight) })).sort((a,b) => a.x - b.x);
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        if(data.length < 2) return;
-        const minW = Math.min(...data.map(d => d.y)) - 1;
-        const maxW = Math.max(...data.map(d => d.y)) + 1;
-        ctx.beginPath(); ctx.strokeStyle = "#39d353"; ctx.lineWidth = 3;
-        data.forEach((p, i) => {
-            const x = (i / (data.length - 1)) * canvas.width;
-            const y = canvas.height - ((p.y - minW) / (maxW - minW)) * canvas.height;
-            if(i === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        logs.forEach(l => {
+            if(l.c) miles += parseFloat(l.m||0);
+            else reps += (parseInt(l.s||0) * parseInt(l.r||0));
+            counts[l.n] = (counts[l.n]||0) + 1;
         });
-        ctx.stroke();
+
+        document.getElementById('st-m').innerText = miles.toFixed(1);
+        document.getElementById('st-v').innerText = reps.toLocaleString();
+        const top = Object.keys(counts).reduce((a,b)=> counts[a]>counts[b]?a:b, "--");
+        document.getElementById('st-f').innerText = top.toUpperCase();
+
+        const wts = Object.keys(vit).sort((a,b)=>new Date(a)-new Date(b));
+        if(wts.length > 1) {
+            let delta = vit[wts[wts.length-1]].w - vit[wts[0]].w;
+            document.getElementById('st-d').innerText = (delta>0?"+":"")+delta.toFixed(1);
+        }
+
+        document.getElementById('hist-list').innerHTML = logs.reverse().map(l => `
+            <div class="glass-card" style="padding:10px; font-size:0.8rem;">
+                <strong>${l.n}</strong> - ${l.c ? l.m+'mi' : l.s+'x'+l.r} <small>(${l.d})</small>
+            </div>
+        `).join('');
     }
 
-    // Start Up
-    initDailyMission();
+    function renderLib(q="") {
+        document.getElementById('lib-list').innerHTML = libDB.filter(x => x.n.toLowerCase().includes(q.toLowerCase())).map(x => `
+            <div class="glass-card" style="display:flex; justify-content:space-between;">
+                <div><strong>${x.n}</strong><br><small>${x.m}</small></div>
+                <button onclick="sync('${x.n}')" style="background:var(--bot-glow); border:none; border-radius:5px; font-weight:800; padding:5px 10px;">SYNC</button>
+            </div>
+        `).join('');
+    }
+
+    function sync(n) { show('today', document.querySelector('.nav-item')); document.getElementById('ex-name').value = n; }
+    function saveSet() {
+        const w = document.getElementById('set-w').value;
+        const c = document.getElementById('set-c').value;
+        if(w) { const v=JSON.parse(localStorage.getItem('uVit')||'{}'); v[new Date().toLocaleDateString()]={w}; localStorage.setItem('uVit', JSON.stringify(v)); }
+        if(c) localStorage.setItem('uGoal', c);
+    }
+
+    updateXP();
 </script>
 </body>
 </html>

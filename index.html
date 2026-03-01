@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronBot: Evolution</title>
+    <title>IronBot: Executive Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,45 +14,37 @@
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 120px; }
         .container { width: 100%; max-width: 450px; margin: auto; padding: 20px; box-sizing: border-box; }
 
-        /* --- THE NEW IRONBOT --- */
-        .bot-scene { height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .bot-body { width: 80px; height: 80px; background: #30363d; border: 4px solid var(--bot-glow); border-radius: 25px; position: relative; animation: float 3s infinite ease-in-out; box-shadow: 0 0 20px rgba(0,255,204,0.2); }
+        /* --- THE BOT --- */
+        .bot-scene { height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .bot-body { width: 70px; height: 70px; background: #30363d; border: 3px solid var(--bot-glow); border-radius: 20px; position: relative; animation: float 3s infinite ease-in-out; }
+        .arm { width: 12px; height: 35px; background: #30363d; border: 2px solid var(--bot-glow); position: absolute; border-radius: 10px; top: 15px; transition: 0.3s; }
+        .arm-l { left: -20px; transform-origin: top right; } .arm-r { right: -20px; transform-origin: top left; }
+        .eyes { display: flex; justify-content: space-around; width: 35px; margin: 18px auto 5px; }
+        .eye { width: 8px; height: 8px; background: var(--bot-glow); border-radius: 50%; box-shadow: 0 0 8px var(--bot-glow); }
+        .mouth { width: 15px; height: 3px; background: var(--bot-glow); margin: 5px auto; border-radius: 10px; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .resting .eye { height: 2px; } .working .mouth { height: 8px; width: 8px; border-radius: 50%; }
+
+        /* --- UI ELEMENTS --- */
+        .glass-card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 18px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.08); }
+        h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 10px; }
+        .timer-display { font-size: 2.2rem; font-weight: 900; color: var(--rest); font-family: monospace; }
         
-        /* Arms */
-        .arm { width: 15px; height: 40px; background: #30363d; border: 3px solid var(--bot-glow); position: absolute; border-radius: 10px; top: 20px; transition: 0.3s; }
-        .arm-l { left: -25px; transform-origin: top right; transform: rotate(10deg); }
-        .arm-r { right: -25px; transform-origin: top left; transform: rotate(-10deg); }
+        .mission-item { display: flex; align-items: center; background: #0d1117; padding: 10px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid #333; font-size: 0.8rem; }
+        .mission-item.done { border-left-color: var(--bright-green); opacity: 0.5; }
+
+        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; margin-bottom: 8px; font-family: 'Outfit'; }
+        .btn-cyber { padding: 12px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-family: 'Outfit'; width: 100%; }
         
-        /* Face */
-        .eyes { display: flex; justify-content: space-around; width: 40px; margin: 20px auto 5px; }
-        .eye { width: 10px; height: 10px; background: var(--bot-glow); border-radius: 50%; box-shadow: 0 0 10px var(--bot-glow); }
-        .mouth { width: 20px; height: 4px; background: var(--bot-glow); margin: 5px auto; border-radius: 10px; box-shadow: 0 0 5px var(--bot-glow); transition: 0.3s; }
-
-        /* Animations */
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        .working .arm-l { transform: rotate(140deg); }
-        .working .arm-r { transform: rotate(-140deg); }
-        .working .mouth { height: 10px; width: 10px; border-radius: 50%; }
-        .resting .eye { height: 2px; }
-        .resting .mouth { width: 10px; opacity: 0.5; }
-
-        /* XP BAR */
-        .xp-container { width: 150px; height: 8px; background: #111; border-radius: 10px; margin-top: 15px; overflow: hidden; border: 1px solid #333; }
-        #xp-bar { width: 30%; height: 100%; background: linear-gradient(90deg, var(--bot-glow), var(--primary)); transition: 1s; }
-
-        /* --- UI COMPONENTS --- */
-        .glass-card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.08); }
-        .debrief-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .debrief-card { background: rgba(88,166,255,0.05); border: 1px solid rgba(88,166,255,0.1); border-radius: 18px; padding: 12px; text-align: center; }
-        .debrief-card label { font-size: 0.55rem; color: var(--primary); display: block; font-weight: 800; }
-        .debrief-card span { font-size: 1rem; font-weight: 900; }
-
-        input, select { background: #0d1117; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px; font-family: 'Outfit'; }
-        .btn-cyber { padding: 14px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-family: 'Outfit'; width: 100%; }
-        .nav-bar { position: fixed; bottom: 20px; left: 10px; right: 10px; background: #161b22; border-radius: 30px; height: 70px; display: flex; justify-content: space-around; align-items: center; border: 1px solid #333; }
-        .nav-item { color: #8b949e; background: none; border: none; font-size: 0.65rem; display: flex; flex-direction: column; align-items: center; }
+        /* LIBRARY */
+        .video-box { width: 100%; height: 130px; background: #000; border-radius: 12px; border: 1px solid var(--primary); margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 0.6rem; letter-spacing: 2px; }
+        
+        .nav-bar { position: fixed; bottom: 15px; left: 10px; right: 10px; background: #161b22; border-radius: 25px; height: 65px; display: flex; justify-content: space-around; align-items: center; border: 1px solid #333; }
+        .nav-item { color: #8b949e; background: none; border: none; font-size: 0.6rem; display: flex; flex-direction: column; align-items: center; }
         .nav-item.active { color: var(--bot-glow); }
-        .page { display: none; } .page.active { display: block; }
+        
+        .page { display: none; } .page.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -61,62 +53,68 @@
     <section id="page-today" class="page active">
         <div class="bot-scene" id="bot-scene">
             <div class="bot-body" id="iron-bot">
-                <div class="arm arm-l"></div>
-                <div class="arm arm-r"></div>
+                <div class="arm arm-l"></div><div class="arm arm-r"></div>
                 <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
                 <div class="mouth"></div>
             </div>
-            <div class="xp-container"><div id="xp-bar"></div></div>
-            <div style="font-size: 0.6rem; margin-top: 5px; font-weight: 800; color: var(--bot-glow);">LVL <span id="bot-lvl">1</span> BOT COMPANION</div>
+            <div style="font-size: 0.65rem; margin-top: 10px; font-weight: 800; color: #fff;" id="bot-msg">SYSTEMS ONLINE</div>
+        </div>
+
+        <div class="glass-card">
+            <h3>Daily Protocol</h3>
+            <div id="mission-list"></div>
         </div>
 
         <div class="glass-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 id="timer-display" style="font-size: 2rem; color: var(--rest); margin:0;">01:30</h3>
+                <span class="timer-display" id="timer-display">01:30</span>
                 <div style="display:flex; gap:5px;">
-                    <button class="btn-cyber" style="width:40px; padding:5px; background:#333; color:white;" onclick="adjTimer(-30)">-</button>
-                    <button id="t-btn" class="btn-cyber" style="width:100px; padding:5px; background:var(--rest); color:white;" onclick="toggleTimer()">Rest</button>
-                    <button class="btn-cyber" style="width:40px; padding:5px; background:#333; color:white;" onclick="adjTimer(30)">+</button>
+                    <button class="btn-cyber" style="width:40px; background:#333; color:white;" onclick="adjTimer(-30)">-</button>
+                    <button class="btn-cyber" id="t-btn" style="width:80px; background:var(--rest); color:white;" onclick="toggleTimer()">REST</button>
+                    <button class="btn-cyber" style="width:40px; background:#333; color:white;" onclick="adjTimer(30)">+</button>
                 </div>
             </div>
         </div>
 
         <div class="glass-card">
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <button id="m-w" class="btn-cyber" style="font-size:0.6rem; background:var(--card); color:var(--bot-glow)" onclick="setMode('w')">Lifting</button>
+            <h3>Activity Log</h3>
+            <div style="display:flex; gap:5px; margin-bottom:8px;">
+                <button id="m-w" class="btn-cyber" style="font-size:0.6rem; background:var(--card); color:var(--bot-glow)" onclick="setMode('w')">Weights</button>
                 <button id="m-c" class="btn-cyber" style="font-size:0.6rem; background:none; color:#666" onclick="setMode('c')">Cardio</button>
             </div>
             <input id="ex-name" placeholder="Exercise Name">
-            <div id="w-inputs" style="display:flex; gap:10px;"><input type="number" id="ex-s" placeholder="Sets"><input type="number" id="ex-r" placeholder="Reps"></div>
-            <div id="c-inputs" style="display:none; gap:10px;"><input type="number" id="ex-t" placeholder="Min"><input type="number" id="ex-d" placeholder="Miles"></div>
-            <button class="btn-cyber" style="background:var(--primary); color:white;" onclick="logData()">Sync Session</button>
+            <div id="w-inputs" style="display:flex; gap:8px;"><input type="number" id="ex-s" placeholder="Sets"><input type="number" id="ex-r" placeholder="Reps"></div>
+            <div id="c-inputs" style="display:none; gap:8px;"><input type="number" id="ex-t" placeholder="Min"><input type="number" id="ex-d" placeholder="Miles"></div>
+            <button class="btn-cyber" style="background:var(--primary); color:white; margin-top:5px;" onclick="logData()">Sync Data</button>
         </div>
     </section>
 
     <section id="page-stats" class="page">
-        <h2>Intelligence Debrief</h2>
-        <div class="debrief-grid">
-            <div class="debrief-card"><label>Monthly Miles</label><span id="st-m">0.0</span></div>
-            <div class="debrief-card"><label>Total Reps</label><span id="st-v">0</span></div>
-            <div class="debrief-card"><label>Weight Delta</label><span id="st-d">--</span></div>
-            <div class="debrief-card"><label>Signature</label><span id="st-f" style="font-size:0.7rem;">--</span></div>
+        <h2>Intelligence</h2>
+        <div class="glass-card">
+            <h3>Weight Trend</h3>
+            <canvas id="weightGraph" style="width:100%; height:140px;"></canvas>
         </div>
-        <div class="glass-card"><canvas id="wGraph" style="width:100%; height:120px;"></canvas></div>
-        <div id="hist-list"></div>
+        <div id="history-list"></div>
     </section>
 
     <section id="page-lib" class="page">
         <h2>Encyclopedia</h2>
-        <input type="text" placeholder="Search..." oninput="renderLib(this.value)">
+        <input type="text" placeholder="Search movements..." oninput="renderLib(this.value)">
         <div id="lib-list"></div>
     </section>
 
     <section id="page-set" class="page">
         <h2>Calibration</h2>
         <div class="glass-card">
-            <label>Weight (lbs)</label><input type="number" id="set-w">
-            <label>Calorie Goal</label><input type="number" id="set-c">
-            <button class="btn-cyber" style="background:var(--primary); color:white;" onclick="saveSet()">Save</button>
+            <h3>Biometrics & Fuel</h3>
+            <label style="font-size:0.6rem; color:#888;">Current Weight (lbs)</label>
+            <input type="number" id="set-w">
+            <label style="font-size:0.6rem; color:#888;">Calorie Intake Today</label>
+            <input type="number" id="set-fuel">
+            <label style="font-size:0.6rem; color:#888;">Daily Goal</label>
+            <input type="number" id="set-goal">
+            <button class="btn-cyber" style="background:var(--primary); color:white;" onclick="saveSet()">Update Systems</button>
         </div>
     </section>
 </div>
@@ -130,10 +128,17 @@
 
 <script>
     const libDB = [
-        {n:"Bench Press", m:"Chest"}, {n:"Squats", m:"Legs"}, {n:"Deadlift", m:"Back"},
-        {n:"Bicep Curls", m:"Arms"}, {n:"Running", m:"Cardio"}, {n:"Cycling", m:"Cardio"}
+        {n:"DB Goblet Squats", m:"Legs", i:"Hold dumbbell at chest. Squat until thighs are parallel to floor."},
+        {n:"DB Bench Press", m:"Chest", i:"Lie on bench, press dumbbells up while keeping core engaged."},
+        {n:"DB Incline Row", m:"Back", i:"Chest-supported on incline bench. Pull weights to hips."},
+        {n:"DB Shoulder Press", m:"Shoulders", i:"Sit upright, press weights from shoulder height to overhead."},
+        {n:"DB Hammer Curls", m:"Arms", i:"Keep palms facing in. Great for brachialis development."},
+        {n:"DB Lateral Raises", m:"Shoulders", i:"Raise weights to sides with slight elbow bend."},
+        {n:"Running", m:"Cardio", i:"Steady state cardio for heart health."},
+        {n:"Walking", m:"Cardio", i:"Low impact recovery movement."}
     ];
-    let mode = 'w', tSec = 90, tRun = false, tInt;
+
+    let mode = 'w', tSec = 90, tRun = false, tInt, missions = [];
 
     function show(p, b) {
         document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
@@ -141,9 +146,34 @@
         document.getElementById('page-'+p).classList.add('active');
         b.classList.add('active');
         if(p==='stats') renderStats();
-        if(p==='lib') renderLib();
     }
 
+    // --- PROTOCOL ---
+    function initMissions() {
+        const saved = JSON.parse(localStorage.getItem('iBotMissions'));
+        const today = new Date().toLocaleDateString();
+        if(saved && saved.date === today) { missions = saved.data; }
+        else {
+            const shuffled = [...libDB].sort(() => 0.5 - Math.random());
+            missions = shuffled.slice(0, 3).map(ex => ({ n: ex.n, done: false }));
+            localStorage.setItem('iBotMissions', JSON.stringify({ date: today, data: missions }));
+        }
+        renderMissions();
+    }
+    function renderMissions() {
+        document.getElementById('mission-list').innerHTML = missions.map((m, i) => `
+            <div class="mission-item ${m.done ? 'done' : ''}" onclick="toggleM(${i})">
+                <span style="margin-right:10px">${m.done ? '✅' : '⬜'}</span> ${m.n}
+            </div>
+        `).join('');
+    }
+    function toggleM(i) {
+        missions[i].done = !missions[i].done;
+        localStorage.setItem('iBotMissions', JSON.stringify({ date: new Date().toLocaleDateString(), data: missions }));
+        renderMissions();
+    }
+
+    // --- TRACKER & TIMER ---
     function setMode(m) {
         mode = m;
         document.getElementById('w-inputs').style.display = m==='w'?'flex':'none';
@@ -151,7 +181,6 @@
         document.getElementById('m-w').style.color = m==='w'?'var(--bot-glow)':'#666';
         document.getElementById('m-c').style.color = m==='c'?'var(--bot-glow)':'#666';
     }
-
     function adjTimer(v) { tSec = Math.max(0, tSec+v); updateT(); }
     function toggleTimer() {
         const b = document.getElementById('bot-scene');
@@ -167,74 +196,73 @@
     }
 
     function logData() {
-        const n = document.getElementById('ex-name').value; if(!n) return;
+        const name = document.getElementById('ex-name').value; if(!name) return;
         const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
-        const entry = {id:Date.now(), d:new Date().toLocaleDateString(), n, c:mode==='c'};
+        const entry = {id:Date.now(), d:new Date().toLocaleDateString(), n:name, c:mode==='c'};
         if(mode==='w') { entry.s=document.getElementById('ex-s').value; entry.r=document.getElementById('ex-r').value; }
         else { entry.t=document.getElementById('ex-t').value; entry.m=document.getElementById('ex-d').value; }
         logs.push(entry); localStorage.setItem('uLogs', JSON.stringify(logs));
-        
         document.getElementById('bot-scene').classList.add('working');
         setTimeout(()=> document.getElementById('bot-scene').classList.remove('working'), 1000);
-        updateXP();
     }
 
-    function updateXP() {
-        const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
-        let total = logs.length * 20; // 20 XP per entry
-        let lvl = Math.floor(total / 100) + 1;
-        let prog = total % 100;
-        document.getElementById('xp-bar').style.width = prog + "%";
-        document.getElementById('bot-lvl').innerText = lvl;
-    }
-
-    function renderStats() {
-        const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
-        const vit = JSON.parse(localStorage.getItem('uVit')||'{}');
-        let miles = 0, reps = 0, counts = {};
-        
-        logs.forEach(l => {
-            if(l.c) miles += parseFloat(l.m||0);
-            else reps += (parseInt(l.s||0) * parseInt(l.r||0));
-            counts[l.n] = (counts[l.n]||0) + 1;
-        });
-
-        document.getElementById('st-m').innerText = miles.toFixed(1);
-        document.getElementById('st-v').innerText = reps.toLocaleString();
-        const top = Object.keys(counts).reduce((a,b)=> counts[a]>counts[b]?a:b, "--");
-        document.getElementById('st-f').innerText = top.toUpperCase();
-
-        const wts = Object.keys(vit).sort((a,b)=>new Date(a)-new Date(b));
-        if(wts.length > 1) {
-            let delta = vit[wts[wts.length-1]].w - vit[wts[0]].w;
-            document.getElementById('st-d').innerText = (delta>0?"+":"")+delta.toFixed(1);
-        }
-
-        document.getElementById('hist-list').innerHTML = logs.reverse().map(l => `
-            <div class="glass-card" style="padding:10px; font-size:0.8rem;">
-                <strong>${l.n}</strong> - ${l.c ? l.m+'mi' : l.s+'x'+l.r} <small>(${l.d})</small>
-            </div>
-        `).join('');
+    function saveSet() {
+        const w = document.getElementById('set-w').value;
+        const f = document.getElementById('set-fuel').value;
+        const g = document.getElementById('set-goal').value;
+        const date = new Date().toLocaleDateString();
+        const v=JSON.parse(localStorage.getItem('uVit')||'{}');
+        if(!v[date]) v[date] = {};
+        if(w) v[date].w = w;
+        if(f) v[date].f = f;
+        if(g) localStorage.setItem('uGoal', g);
+        localStorage.setItem('uVit', JSON.stringify(v));
+        document.getElementById('bot-msg').innerText = "CALIBRATION SYNCED";
     }
 
     function renderLib(q="") {
         document.getElementById('lib-list').innerHTML = libDB.filter(x => x.n.toLowerCase().includes(q.toLowerCase())).map(x => `
-            <div class="glass-card" style="display:flex; justify-content:space-between;">
-                <div><strong>${x.n}</strong><br><small>${x.m}</small></div>
-                <button onclick="sync('${x.n}')" style="background:var(--bot-glow); border:none; border-radius:5px; font-weight:800; padding:5px 10px;">SYNC</button>
+            <div class="glass-card">
+                <div class="video-box">▶ FEED: ${x.n.toUpperCase()}</div>
+                <div style="display:flex; justify-content:space-between; align-items:start;">
+                    <div><strong>${x.n}</strong><br><small style="color:var(--primary)">${x.m}</small></div>
+                    <button onclick="sync('${x.n}')" style="background:var(--bot-glow); border:none; padding:5px 10px; border-radius:8px; font-weight:800; cursor:pointer;">SYNC</button>
+                </div>
+                <p style="font-size:0.75rem; color:#888; margin-top:10px;">${x.i}</p>
             </div>
         `).join('');
     }
 
     function sync(n) { show('today', document.querySelector('.nav-item')); document.getElementById('ex-name').value = n; }
-    function saveSet() {
-        const w = document.getElementById('set-w').value;
-        const c = document.getElementById('set-c').value;
-        if(w) { const v=JSON.parse(localStorage.getItem('uVit')||'{}'); v[new Date().toLocaleDateString()]={w}; localStorage.setItem('uVit', JSON.stringify(v)); }
-        if(c) localStorage.setItem('uGoal', c);
+
+    function renderStats() {
+        const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
+        document.getElementById('history-list').innerHTML = logs.reverse().map(l => `
+            <div class="glass-card" style="padding:12px; font-size:0.8rem;">
+                <strong>${l.n}</strong><br>
+                <small>${l.c ? l.m+'mi' : l.s+'x'+l.r} • ${l.d}</small>
+            </div>
+        `).join('');
+        renderGraph();
     }
 
-    updateXP();
+    function renderGraph() {
+        const canvas = document.getElementById('weightGraph'); const ctx = canvas.getContext('2d');
+        const v = JSON.parse(localStorage.getItem('uVit')||'{}');
+        const data = Object.keys(v).filter(k => v[k].w).map(d => ({ x: new Date(d), y: parseFloat(v[d].w) })).sort((a,b) => a.x - b.x);
+        ctx.clearRect(0,0,canvas.width,canvas.height); if(data.length < 2) return;
+        const minW = Math.min(...data.map(d => d.y)) - 1, maxW = Math.max(...data.map(d => d.y)) + 1;
+        ctx.beginPath(); ctx.strokeStyle = "#39d353"; ctx.lineWidth = 3;
+        data.forEach((p, i) => {
+            const x = (i / (data.length - 1)) * canvas.width;
+            const y = canvas.height - ((p.y - minW) / (maxW - minW)) * canvas.height;
+            if(i === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        });
+        ctx.stroke();
+    }
+
+    initMissions();
+    renderLib();
 </script>
 </body>
 </html>

@@ -3,45 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronTrack Ultra - Command</title>
+    <title>IronBot Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0f0f0f; --card: #1a1a1a; --text: #ffffff;
-            --primary: #00ff88; --accent: #333; --rest: #3498db; --fuel: #f1c40f; --danger: #ff4444;
+            --bg: #0a0e14; --card: #161b22; --text: #e6edf3;
+            --primary: #58a6ff; --bot-glow: #00ffcc; --rest: #79c0ff;
+            --danger: #ff7b72; --bright-green: #39d353; --fuel: #f1c40f;
         }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; }
-        .container { width: 100%; max-width: 500px; margin: auto; padding: 15px; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 120px; overflow-x: hidden; }
+        .container { width: 100%; max-width: 450px; margin: auto; padding: 20px; box-sizing: border-box; }
+
+        /* --- THE ROBOT AVATAR --- */
+        .bot-container { height: 200px; display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 10px; }
+        .bot { width: 100px; height: 100px; background: #30363d; border: 4px solid var(--bot-glow); border-radius: 30px; position: relative; animation: float 3s ease-in-out infinite; box-shadow: 0 0 20px rgba(0,255,204,0.3); z-index: 2; transition: 0.5s; }
+        .bot-eyes { display: flex; justify-content: space-around; width: 60px; margin: 30px auto; }
+        .eye { width: 12px; height: 12px; background: var(--bot-glow); border-radius: 50%; transition: 0.3s; box-shadow: 0 0 10px var(--bot-glow); }
         
-        /* NAVIGATION */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: rgba(26,26,26,0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--accent); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
-        .nav-item { background: none; border: none; color: #666; font-size: 0.65rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .nav-item.active { color: var(--primary); }
-        .page { display: none; animation: slide 0.3s ease; }
+        /* Bot States */
+        .bot.resting { border-color: var(--rest); box-shadow: 0 0 20px rgba(121, 192, 255, 0.4); animation: sleep 4s ease-in-out infinite; }
+        .bot.resting .eye { height: 2px; border-radius: 2px; margin-top: 5px; box-shadow: 0 0 5px var(--rest); background: var(--rest); }
+        .bot.working { transform: scale(1.1); border-color: var(--bright-green); }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes sleep { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(0.92); opacity: 1; } }
+
+        .bot-speech { position: absolute; top: 10px; right: 10%; background: white; color: black; padding: 8px 15px; border-radius: 18px 18px 18px 0; font-size: 0.75rem; font-weight: 800; max-width: 160px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 3; }
+
+        /* --- UI COMPONENTS --- */
+        .glass-card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 15px; }
+        
+        .cooldown-timer { text-align: center; background: rgba(121, 192, 255, 0.05); border-radius: 24px; padding: 20px; border: 1px solid rgba(121, 192, 255, 0.2); }
+        .timer-display { font-size: 4rem; font-weight: 900; color: var(--rest); font-variant-numeric: tabular-nums; line-height: 1; margin: 10px 0; }
+
+        .btn-cyber { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; font-family: 'Outfit'; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(88,166,255,0.3); }
+        .btn-cooldown { background: var(--rest); color: white; }
+        .btn-cooldown.stop { background: var(--danger); }
+
+        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 14px; border-radius: 14px; width: 100%; box-sizing: border-box; margin-bottom: 12px; font-family: 'Outfit'; font-size: 1rem; }
+        
+        .mode-pill { display: flex; background: #0d1117; padding: 5px; border-radius: 14px; margin-bottom: 15px; border: 1px solid #30363d; }
+        .mode-btn { flex: 1; padding: 10px; border: none; background: none; color: #666; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; }
+        .mode-btn.active { background: var(--card); color: var(--bot-glow); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+
+        .nav-bar { position: fixed; bottom: 25px; left: 20px; right: 20px; background: rgba(22, 27, 34, 0.95); border-radius: 30px; height: 75px; display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; }
+        .nav-item { color: #8b949e; text-decoration: none; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; background: none; border: none; font-weight: 600; }
+        .nav-item.active { color: var(--bot-glow); }
+        .nav-icon { font-size: 1.5rem; margin-bottom: 4px; }
+
+        /* Summary Stats */
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .stat-card { background: #0d1117; padding: 15px; border-radius: 18px; text-align: center; border: 1px solid #30363d; }
+        .stat-card small { font-size: 0.6rem; color: #8b949e; display: block; margin-bottom: 5px; }
+        .stat-card span { font-size: 1.2rem; font-weight: 800; color: var(--bright-green); }
+
+        #weightGraph { width: 100%; height: 140px; margin-top: 10px; }
+        .page { display: none; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
-
-        /* CARDS & UI */
-        .card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 15px; border: 1px solid var(--accent); }
-        h2 { font-size: 1.8rem; font-weight: 800; margin: 10px 0; }
-        h3 { color: var(--primary); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
-
-        /* INPUTS */
-        input, select { width: 100%; padding: 14px; margin-bottom: 12px; background: var(--accent); border: none; border-radius: 12px; color: var(--text); font-size: 1rem; box-sizing: border-box;}
-        .btn-main { width: 100%; padding: 15px; background: var(--primary); color: #000; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-outline { background: none; border: 1px solid var(--accent); color: var(--text); padding: 10px; border-radius: 10px; cursor: pointer; flex: 1; font-size: 0.75rem; }
-        
-        /* MEGA TIMER */
-        .cooldown-wrap { display: flex; gap: 15px; align-items: stretch; margin-bottom: 15px; }
-        .mega-timer { flex: 1; background: #000; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--rest); padding: 10px; }
-        .timer-val { font-size: 3rem; font-weight: 900; color: var(--rest); font-variant-numeric: tabular-nums; line-height: 1; margin: 5px 0; }
-        .timer-ctrl { display: flex; gap: 5px; width: 100%; }
-        .timer-ctrl button { flex: 1; padding: 5px; font-size: 0.7rem; background: var(--accent); border: none; color: #fff; border-radius: 5px; }
-
-        /* GRAPH & CALENDAR */
-        #weightGraph { width: 100%; height: 120px; margin-bottom: 10px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day { padding: 12px 0; text-align: center; background: var(--accent); border-radius: 8px; font-size: 0.7rem; position: relative; cursor: pointer; }
-        .day.selected { background: var(--primary); color: #000; font-weight: bold; }
-        .fuel-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--fuel); border-radius: 0 0 8px 8px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -49,261 +70,257 @@
 <div class="container">
     
     <section id="page-today" class="page active">
-        <h2>Today</h2>
-
-        <div class="cooldown-wrap">
-            <div class="card" style="flex: 1.2; margin-bottom: 0;">
-                <h3>Tracker</h3>
-                <input list="ex-lib" id="ex-name" placeholder="Exercise">
-                <datalist id="ex-lib"></datalist>
-                <div style="display:flex; gap:8px;">
-                    <input type="number" id="ex-sets" placeholder="Sets" oninput="updateDots()">
-                    <input type="number" id="ex-reps" placeholder="Reps">
+        <div class="bot-container">
+            <div id="iron-bot" class="bot">
+                <div class="bot-eyes">
+                    <div id="eye-l" class="eye"></div>
+                    <div id="eye-r" class="eye"></div>
                 </div>
-                <div id="dot-container" style="display:flex; justify-content:center; gap:5px; margin-bottom:10px;"></div>
-                <button id="set-btn" class="btn-main" onclick="logSet()">Log Set 1</button>
             </div>
+            <div class="bot-speech" id="bot-message">SYSTEMS ONLINE. READY TO WORK?</div>
+        </div>
 
-            <div class="mega-timer">
-                <h3 style="color:var(--rest); margin: 0; font-size: 0.6rem;">Cooldown</h3>
-                <div class="timer-val" id="timer-display">01:30</div>
-                <button id="timer-toggle" onclick="toggleTimer()" style="width:100%; background:var(--rest); border:none; color:white; border-radius:8px; padding:8px; font-weight:800; cursor:pointer; margin-bottom:8px;">START</button>
-                <div class="timer-ctrl">
-                    <button onclick="adjustTimer(-30)">-30s</button>
-                    <button onclick="adjustTimer(30)">+30s</button>
-                </div>
+        <div class="cooldown-timer">
+            <h3>Cooldown Protocol</h3>
+            <div class="timer-display" id="timer-display">01:30</div>
+            <div style="display:flex; gap:10px;">
+                <button id="timer-toggle" class="btn-cyber btn-cooldown" onclick="toggleTimer()">Start Cooldown</button>
+                <button class="btn-cyber" style="width:70px; background:#30363d; color:white;" onclick="adjustTimer(30)">+30s</button>
             </div>
         </div>
 
-        <div class="card">
-            <h3>Routine Architect</h3>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <button class="btn-outline" onclick="buildRoutine('Arms', this)">Arms</button>
-                <button class="btn-outline" onclick="buildRoutine('Legs', this)">Legs</button>
-                <button class="btn-outline" onclick="buildRoutine('Back', this)">Back</button>
-                <button class="btn-outline" onclick="buildRoutine('Core', this)">Core</button>
+        <div class="glass-card" style="margin-top:20px;">
+            <h3>Activity Logger</h3>
+            <div class="mode-pill">
+                <button id="m-weights" class="mode-btn active" onclick="setMode('weights')">Weights</button>
+                <button id="m-cardio" class="mode-btn" onclick="setMode('cardio')">Cardio</button>
             </div>
-            <p id="routine-desc" style="font-size:0.7rem; color:#888; margin:0;"></p>
+            
+            <input id="ex-name" placeholder="Activity (e.g. Squats, Run)">
+            
+            <div id="input-weights" style="display:flex; gap:10px;">
+                <input type="number" id="ex-sets" placeholder="Sets">
+                <input type="number" id="ex-reps" placeholder="Reps">
+            </div>
+            
+            <div id="input-cardio" style="display:none; gap:10px;">
+                <input type="text" id="ex-time" placeholder="Time (min)">
+                <input type="text" id="ex-dist" placeholder="Dist (mi)">
+            </div>
+            
+            <button class="btn-cyber btn-primary" onclick="handleLog()">Log Session</button>
         </div>
 
         <div id="today-logs"></div>
     </section>
 
     <section id="page-history" class="page">
-        <h2>History</h2>
+        <h2 style="margin-bottom:20px;">Biometric History</h2>
         
-        <div class="card">
+        <div class="glass-card">
+            <h3>Weight Trend</h3>
             <canvas id="weightGraph"></canvas>
-            <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                <div style="text-align:center; flex:1">
-                    <small style="color:#888">CURRENT WEIGHT</small>
-                    <div id="cur-weight-display" style="font-weight:800; color:var(--primary)">--</div>
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <small>CURRENT</small>
+                    <span id="cur-w">--</span>
                 </div>
-                <div style="text-align:center; flex:1">
-                    <small style="color:#888">DAILY GOAL</small>
-                    <div id="cur-goal-display" style="font-weight:800; color:var(--fuel)">--</div>
+                <div class="stat-card">
+                    <small>GOAL</small>
+                    <span id="cur-g" style="color:var(--fuel)">--</span>
                 </div>
             </div>
         </div>
 
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <button onclick="changeMonth(-1)" style="color:var(--text); background:none; border:none;">◀</button>
-                <h4 id="month-name" style="margin:0;"></h4>
-                <button onclick="changeMonth(1)" style="color:var(--text); background:none; border:none;">▶</button>
-            </div>
-            <div class="calendar-grid" id="calendar"></div>
-        </div>
-
-        <div class="card" style="border-color: var(--primary);">
-            <h3>Update Vitals (<span id="vit-date"></span>)</h3>
+        <div class="glass-card">
+            <h3>Update Vitals</h3>
             <div style="display:flex; gap:10px;">
-                <input type="number" id="weight-input" placeholder="Weight (lbs)">
-                <input type="number" id="cal-input" placeholder="Calories">
+                <input type="number" id="vit-w" placeholder="Weight">
+                <input type="number" id="vit-g" placeholder="Cal Goal">
             </div>
-            <input type="number" id="goal-input" placeholder="Daily Calorie Goal">
-            <button onclick="saveVitals()" class="btn-main">Save Updates</button>
+            <button class="btn-cyber btn-primary" onclick="updateVitals()">Sync Vitals</button>
         </div>
 
         <div id="history-details"></div>
     </section>
-
-    <section id="page-lib" class="page">
-        <h2>Encyclopedia</h2>
-        <input type="text" id="lib-search" placeholder="Search movements..." oninput="renderLibrary()">
-        <div id="lib-list"></div>
-    </section>
 </div>
 
-<nav class="bottom-nav">
-    <button class="nav-item active" onclick="showPage('today', this)"><span>⚡</span>Today</button>
-    <button class="nav-item" onclick="showPage('history', this)"><span>📅</span>History</button>
-    <button class="nav-item" onclick="showPage('lib', this)"><span>📚</span>Library</button>
+<nav class="nav-bar">
+    <button class="nav-item active" onclick="showPage('today', this)">
+        <span class="nav-icon">🤖</span>Today
+    </button>
+    <button class="nav-item" onclick="showPage('history', this)">
+        <span class="nav-icon">📊</span>History
+    </button>
 </nav>
 
 <script>
-    let currentSet = 1, timerSec = 90, timerRunning = false, timerInt;
-    let selectedDate = new Date().toLocaleDateString();
-    let viewDate = new Date();
-
-    const db = [
-        { name: "DB Bicep Curls", muscle: "Arms", info: "Elbows pinned." },
-        { name: "DB Hammer Curls", muscle: "Arms", info: "Neutral grip." },
-        { name: "DB Goblet Squats", muscle: "Legs", info: "Hold DB at chest." },
-        { name: "DB Romanian Deadlift", muscle: "Legs", info: "Feel hamstrings." },
-        { name: "DB Single Arm Row", muscle: "Back", info: "Back flat." },
-        { name: "DB Russian Twists", muscle: "Core", info: "Rotate torso." },
-        { name: "Plank", muscle: "Core", info: "Hold rigid." }
-    ];
+    let timerSec = 90, timerRunning = false, timerInt, trackMode = 'weights';
+    const botMsg = document.getElementById('bot-message');
+    const ironBot = document.getElementById('iron-bot');
 
     function showPage(p, btn) {
         document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(nv => nv.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(ni => ni.classList.remove('active'));
         document.getElementById('page-'+p).classList.add('active');
         btn.classList.add('active');
-        renderAll();
+        if(p === 'history') renderHistory();
     }
 
-    // --- VITALS MANAGEMENT ---
-    function saveVitals() {
-        const v = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
-        const d = selectedDate;
-        if(!v[d]) v[d] = {};
-        if(document.getElementById('weight-input').value) v[d].weight = document.getElementById('weight-input').value;
-        if(document.getElementById('cal-input').value) v[d].cal = document.getElementById('cal-input').value;
-        if(document.getElementById('goal-input').value) localStorage.setItem('calGoal', document.getElementById('goal-input').value);
-        localStorage.setItem('ultraVitals', JSON.stringify(v));
-        renderAll();
-    }
-
-    function updateDashboard() {
-        const v = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
-        const goal = localStorage.getItem('calGoal') || "2500";
-        // Get most recent weight
-        const weightKeys = Object.keys(v).filter(k => v[k].weight).sort((a,b) => new Date(b) - new Date(a));
-        document.getElementById('cur-weight-display').innerText = (weightKeys.length ? v[weightKeys[0]].weight : "--") + " lbs";
-        document.getElementById('cur-goal-display').innerText = goal + " kcal";
-        document.getElementById('vit-date').innerText = selectedDate;
-    }
-
-    // --- MEGA TIMER ---
+    // --- COOLDOWN LOGIC ---
     function toggleTimer() {
-        if(timerRunning) { clearInterval(timerInt); document.getElementById('timer-toggle').innerText = "START"; }
-        else {
+        const btn = document.getElementById('timer-toggle');
+        if(timerRunning) {
+            clearInterval(timerInt);
+            timerRunning = false;
+            ironBot.classList.remove('resting');
+            botMsg.innerText = "COOLDOWN INTERRUPTED. STAY SHARP.";
+            btn.innerText = "Start Cooldown";
+            btn.classList.remove('stop');
+        } else {
+            timerRunning = true;
+            ironBot.classList.add('resting');
+            botMsg.innerText = "RECHARGING SYSTEMS... DEEP BREATHS.";
+            btn.innerText = "Stop Timer";
+            btn.classList.add('stop');
             timerInt = setInterval(() => {
-                timerSec--; updateTimerDisplay();
-                if(timerSec <= 0) { clearInterval(timerInt); playDing(); timerRunning = false; document.getElementById('timer-toggle').innerText = "START"; }
+                timerSec--;
+                updateTimerDisplay();
+                if(timerSec <= 0) {
+                    clearInterval(timerInt);
+                    timerRunning = false;
+                    ironBot.classList.remove('resting');
+                    botMsg.innerText = "POWER RESTORED. NEXT SET!";
+                    btn.innerText = "Start Cooldown";
+                    btn.classList.remove('stop');
+                    playDing();
+                }
             }, 1000);
-            document.getElementById('timer-toggle').innerText = "STOP";
         }
-        timerRunning = !timerRunning;
     }
-    function adjustTimer(amt) { timerSec = Math.max(0, timerSec + amt); updateTimerDisplay(); }
+
+    function adjustTimer(amt) { timerSec += amt; updateTimerDisplay(); }
     function updateTimerDisplay() {
         let m = Math.floor(timerSec/60), s = timerSec%60;
         document.getElementById('timer-display').innerText = `${m}:${s<10?'0'+s:s}`;
     }
-    function playDing() {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator(); const g = ctx.createGain();
-        osc.frequency.setValueAtTime(880, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1);
-        osc.connect(g); g.connect(ctx.destination);
-        osc.start(); osc.stop(ctx.currentTime + 1);
+
+    // --- TRACKER LOGIC ---
+    function setMode(m) {
+        trackMode = m;
+        document.getElementById('input-weights').style.display = m === 'weights' ? 'flex' : 'none';
+        document.getElementById('input-cardio').style.display = m === 'cardio' ? 'flex' : 'none';
+        document.getElementById('m-weights').classList.toggle('active', m === 'weights');
+        document.getElementById('m-cardio').classList.toggle('active', m === 'cardio');
     }
 
-    // --- TRACKER ---
-    function updateDots() {
-        const s = parseInt(document.getElementById('ex-sets').value) || 0;
-        const container = document.getElementById('dot-container');
-        container.innerHTML = Array.from({length:s}, (_,i) => `<div style="width:8px; height:8px; border-radius:50%; background:${i < currentSet-1 ? 'var(--primary)' : '#333'}"></div>`).join('');
-        document.getElementById('set-btn').innerText = (currentSet > s && s > 0) ? "Finish" : `Set ${currentSet}`;
-    }
-    function logSet() {
-        const s = parseInt(document.getElementById('ex-sets').value);
-        if(currentSet < s) { currentSet++; updateDots(); } else { saveWorkout(); resetTracker(); }
-    }
-    function saveWorkout() {
+    function handleLog() {
+        ironBot.classList.add('working');
+        botMsg.innerText = "DATA RECEIVED. EXCELLENT FORM!";
+        setTimeout(() => ironBot.classList.remove('working'), 800);
+        
         const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        logs.push({ id: Date.now(), date: new Date().toLocaleDateString(), name: document.getElementById('ex-name').value, sets: document.getElementById('ex-sets').value, reps: document.getElementById('ex-reps').value });
-        localStorage.setItem('ultraLogs', JSON.stringify(logs)); renderAll();
-    }
-    function resetTracker() { currentSet = 1; document.getElementById('ex-name').value = ''; document.getElementById('ex-sets').value = ''; document.getElementById('ex-reps').value = ''; updateDots(); }
-
-    // --- RENDERING ---
-    function renderWeightGraph() {
-        const canvas = document.getElementById('weightGraph');
-        const ctx = canvas.getContext('2d');
-        const v = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
-        const data = [];
-        const days = new Date(viewDate.getFullYear(), viewDate.getMonth()+1, 0).getDate();
-        for(let i=1; i<=days; i++) {
-            const d = new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString();
-            if(v[d]?.weight) data.push({x: i, y: parseFloat(v[d].weight)});
+        const entry = {
+            id: Date.now(),
+            date: new Date().toLocaleDateString(),
+            name: document.getElementById('ex-name').value || "Activity",
+            isCardio: trackMode === 'cardio'
+        };
+        if(trackMode === 'weights') {
+            entry.sets = document.getElementById('ex-sets').value;
+            entry.reps = document.getElementById('ex-reps').value;
+        } else {
+            entry.time = document.getElementById('ex-time').value;
+            entry.dist = document.getElementById('ex-dist').value;
         }
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        if(data.length < 2) return;
-        const minW = Math.min(...data.map(p => p.y)) - 1;
-        const maxW = Math.max(...data.map(p => p.y)) + 1;
-        ctx.beginPath(); ctx.strokeStyle = "var(--primary)"; ctx.lineWidth = 2;
-        data.forEach((p, i) => {
-            const x = (p.x/days)*canvas.width;
-            const y = canvas.height - ((p.y-minW)/(maxW-minW))*canvas.height;
-            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-        });
-        ctx.stroke();
+        logs.push(entry);
+        localStorage.setItem('ultraLogs', JSON.stringify(logs));
+        renderHistory();
     }
 
-    function renderCalendar() {
-        const grid = document.getElementById('calendar');
-        document.getElementById('month-name').innerText = viewDate.toLocaleString('default', {month:'long', year:'numeric'});
-        const last = new Date(viewDate.getFullYear(), viewDate.getMonth()+1, 0).getDate();
-        const v = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
-        const goal = localStorage.getItem('calGoal') || 2500;
-        grid.innerHTML = '';
-        for(let i=1; i<=last; i++) {
-            const d = new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString();
-            const dayEl = document.createElement('div');
-            dayEl.className = `day ${d === selectedDate ? 'selected' : ''}`;
-            const fuel = Math.min((parseInt(v[d]?.cal||0)/goal)*100, 100);
-            dayEl.innerHTML = `${i} <div class="fuel-bar" style="width:${fuel}%"></div>`;
-            dayEl.onclick = () => { selectedDate = d; renderAll(); };
-            grid.appendChild(dayEl);
+    function updateVitals() {
+        const w = document.getElementById('vit-w').value;
+        const g = document.getElementById('vit-g').value;
+        if(w) {
+            const v = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
+            v[new Date().toLocaleDateString()] = { weight: w };
+            localStorage.setItem('ultraVitals', JSON.stringify(v));
         }
+        if(g) localStorage.setItem('calGoal', g);
+        botMsg.innerText = "BIOMETRICS UPDATED. SYNC SUCCESSFUL.";
+        renderHistory();
     }
 
     function renderHistory() {
         const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        const filtered = logs.filter(l => l.date === selectedDate);
-        const html = filtered.map(l => `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><div><strong>${l.name}</strong><br><small>${l.sets}x${l.reps}</small></div><button onclick="deleteLog(${l.id})" style="color:var(--danger); background:none; border:none;">✕</button></div>`).join('');
+        const vitals = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
+        const goal = localStorage.getItem('calGoal') || "2500";
+        
+        // Update Stats
+        const dates = Object.keys(vitals).sort((a,b) => new Date(b) - new Date(a));
+        document.getElementById('cur-w').innerText = dates.length ? vitals[dates[0]].weight + " lbs" : "--";
+        document.getElementById('cur-g').innerText = goal + " kcal";
+
+        const html = logs.slice().reverse().map(l => `
+            <div class="glass-card" style="padding:15px; margin-bottom:12px; border-left: 4px solid ${l.isCardio ? 'var(--rest)' : 'var(--primary)'}">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong>${l.name}</strong><br>
+                        <small style="color:#8b949e">${l.isCardio ? `${l.time} min • ${l.dist} mi` : `${l.sets} sets • ${l.reps} reps`}</small>
+                    </div>
+                    <button onclick="deleteLog(${l.id})" style="background:none; border:none; color:var(--danger); cursor:pointer;">✕</button>
+                </div>
+            </div>
+        `).join('');
         document.getElementById('history-details').innerHTML = html;
-        if(selectedDate === new Date().toLocaleDateString()) document.getElementById('today-logs').innerHTML = `<h3>Logged Today</h3>` + html;
-    }
-
-    function renderLibrary() {
-        const q = document.getElementById('lib-search').value.toLowerCase();
-        document.getElementById('lib-list').innerHTML = db.filter(ex => ex.name.toLowerCase().includes(q) || ex.muscle.toLowerCase().includes(q)).map(ex => `<div class="card"><strong>${ex.name}</strong> <span style="color:var(--primary); font-size:0.7rem;">${ex.muscle}</span><p style="font-size:0.8rem; color:#888; margin:5px 0 0 0;">${ex.info}</p></div>`).join('');
-    }
-
-    function buildRoutine(f, btn) {
-        document.querySelectorAll('.btn-outline').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const s = db.filter(ex => ex.muscle === f).sort(() => 0.5 - Math.random()).slice(0, 3);
-        document.getElementById('routine-desc').innerHTML = s.map(x => x.name).join(' • ');
-        document.getElementById('ex-name').value = s[0].name;
-        document.getElementById('ex-sets').value = 3; document.getElementById('ex-reps').value = 12;
-        updateDots();
+        renderWeightGraph();
     }
 
     function deleteLog(id) {
         let logs = JSON.parse(localStorage.getItem('ultraLogs')).filter(l => l.id !== id);
-        localStorage.setItem('ultraLogs', JSON.stringify(logs)); renderAll();
+        localStorage.setItem('ultraLogs', JSON.stringify(logs));
+        renderHistory();
     }
-    function changeMonth(dir) { viewDate.setMonth(viewDate.getMonth()+dir); renderAll(); }
-    function renderAll() { updateDashboard(); renderCalendar(); renderHistory(); renderLibrary(); renderWeightGraph(); }
-    
-    document.getElementById('ex-lib').innerHTML = db.map(ex => `<option value="${ex.name}">`).join('');
-    renderAll();
+
+    function renderWeightGraph() {
+        const canvas = document.getElementById('weightGraph');
+        const ctx = canvas.getContext('2d');
+        const v = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
+        const data = Object.keys(v).map(d => ({ x: new Date(d), y: parseFloat(v[d].weight) })).sort((a,b) => a.x - b.x);
+        
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        if(data.length < 2) {
+            ctx.fillStyle = "#666"; ctx.font = "10px Outfit"; ctx.textAlign = "center";
+            ctx.fillText("ADD MORE WEIGHT LOGS TO SEE DATA", canvas.width/2, canvas.height/2);
+            return;
+        }
+
+        const minW = Math.min(...data.map(d => d.y)) - 2;
+        const maxW = Math.max(...data.map(d => d.y)) + 2;
+        
+        ctx.beginPath();
+        ctx.strokeStyle = "#39d353"; ctx.lineWidth = 3;
+        data.forEach((p, i) => {
+            const x = (i / (data.length - 1)) * canvas.width;
+            const y = canvas.height - ((p.y - minW) / (maxW - minW)) * canvas.height;
+            if(i === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        });
+        ctx.stroke();
+    }
+
+    function playDing() {
+        try {
+            const ctx = new AudioContext();
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.frequency.setValueAtTime(587.33, ctx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1);
+            o.connect(g); g.connect(ctx.destination);
+            o.start(); o.stop(ctx.currentTime + 1);
+        } catch(e) {}
+    }
+
+    renderHistory();
 </script>
 </body>
 </html>

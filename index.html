@@ -1,117 +1,61 @@
-<style>
-    .calendar-card {
-        background: var(--card);
-        padding: 15px;
-        border-radius: 15px;
-        margin-bottom: 20px;
-        border: 1px solid var(--accent);
-    }
-    .calendar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    .calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 5px;
-        text-align: center;
-    }
-    .day {
-        padding: 8px 0;
-        font-size: 0.8rem;
-        border-radius: 5px;
-        background: var(--accent);
-        cursor: pointer;
-    }
-    .day.has-data { border: 1px solid var(--primary); color: var(--primary); font-weight: bold; }
-    .day.today { background: var(--primary); color: #000; font-weight: bold; }
-
-    .nutrition-card {
-        background: var(--card);
-        padding: 20px;
-        border-radius: 15px;
-        margin-bottom: 20px;
-    }
-    .cal-input-group { display: flex; gap: 10px; }
-</style>
-
-<div class="calendar-card">
-    <div class="calendar-header">
-        <h4 id="month-name" style="margin:0">Month Year</h4>
-    </div>
-    <div class="calendar-grid" id="calendar-days">
-        </div>
-</div>
-
-<div class="nutrition-card">
-    <h3 style="margin-top:0">🍎 Daily Nutrition</h3>
-    <div class="cal-input-group">
-        <input type="number" id="cal-input" placeholder="Calories (e.g. 2500)">
-        <button class="btn-main" style="width: 40%;" onclick="logCalories()">Save Cal</button>
-    </div>
-    <p id="cal-display" style="font-size: 0.9rem; color: #888; margin-top: 10px;">Goal: Not set</p>
-</div>
-
-<script>
-    const date = new Date();
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        renderCalendar();
-        updateCalorieDisplay();
-        render(); // Your existing workout render
-    });
-
-    function renderCalendar() {
-        const monthDays = document.getElementById('calendar-days');
-        const monthName = document.getElementById('month-name');
-        
-        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-        const prevLastDay = new Date(date.getFullYear(), date.getMonth(), 0).getDate();
-        const firstDayIndex = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-        
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        monthName.innerText = `${months[date.getMonth()]} ${date.getFullYear()}`;
-
-        let days = "";
-
-        // Fill previous month padding
-        for (let x = firstDayIndex; x > 0; x--) {
-            days += `<div class="day" style="opacity:0.3">${prevLastDay - x + 1}</div>`;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IronTrack Ultra - All-in-One</title>
+    <style>
+        /* 1. THEME & CORE DESIGN */
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #ffffff;
+            --primary: #00ff88;
+            --accent: #333;
+            --danger: #ff4444;
         }
 
-        // Current month days
-        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        const loggedDates = logs.map(l => l.date);
-
-        for (let i = 1; i <= lastDay; i++) {
-            const fullDate = `${date.getMonth() + 1}/${i}/${date.getFullYear()}`;
-            const isToday = i === new Date().getDate() && date.getMonth() === new Date().getMonth() ? "today" : "";
-            const hasData = loggedDates.includes(fullDate) ? "has-data" : "";
-            
-            days += `<div class="day ${isToday} ${hasData}">${i}</div>`;
+        [data-theme="light"] {
+            --bg: #f4f7f6;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --primary: #00b361;
+            --accent: #e0e0e0;
         }
 
-        monthDays.innerHTML = days;
-    }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+            margin: 0;
+            padding-bottom: 50px;
+        }
 
-    function logCalories() {
-        const cals = document.getElementById('cal-input').value;
-        if (!cals) return;
-        
-        const nutrition = JSON.parse(localStorage.getItem('nutritionLogs') || '{}');
-        const today = new Date().toLocaleDateString();
-        
-        nutrition[today] = cals;
-        localStorage.setItem('nutritionLogs', JSON.stringify(nutrition));
-        updateCalorieDisplay();
-    }
+        .container { width: 100%; max-width: 500px; margin: auto; padding: 20px; box-sizing: border-box; }
 
-    function updateCalorieDisplay() {
-        const nutrition = JSON.parse(localStorage.getItem('nutritionLogs') || '{}');
-        const today = new Date().toLocaleDateString();
-        const logged = nutrition[today] || "0";
-        document.getElementById('cal-display').innerText = `Today's Calories: ${logged} kcal`;
-    }
-</script>
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .theme-toggle {
+            background: var(--accent);
+            border: none;
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* 2. COMPONENT STYLES */
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 4px 15

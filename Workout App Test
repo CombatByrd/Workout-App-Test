@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Trainer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden { display: none; }
+        .active-tab { border-bottom: 4px solid #3b82f6; color: #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen pb-20">
+
+    <header class="p-6 bg-gray-800 shadow-xl text-center">
+        <h1 class="text-2xl font-bold text-blue-400">⚡️ WORKOUT COMPANION</h1>
+    </header>
+
+    <nav class="flex justify-around bg-gray-800 sticky top-0 border-b border-gray-700 z-10">
+        <button onclick="showSection('workout')" id="btn-workout" class="p-4 flex-1 font-bold active-tab">WORKOUT</button>
+        <button onclick="showSection('pbs')" id="btn-pbs" class="p-4 flex-1 font-bold">PB LOGS</button>
+    </nav>
+
+    <main class="p-4 max-w-md mx-auto">
+
+        <section id="workout-sec">
+            <div class="bg-blue-900/30 p-4 rounded-lg border border-blue-500 mb-6">
+                <h3 class="font-bold text-blue-300">🧘 Opening Stretches</h3>
+                <p class="text-sm italic">Cat-Cow, Arm Circles, Leg Swings (2 mins)</p>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm mb-2">Select Day:</label>
+                <select id="day-select" onchange="loadWorkout()" class="w-full bg-gray-800 p-3 rounded border border-gray-600">
+                    <option value="1">Day 1: Upper Body</option>
+                    <option value="2">Day 2: Lower Body</option>
+                    <option value="3">Day 3: Full Body/Core</option>
+                </select>
+            </div>
+
+            <div id="exercise-list" class="space-y-4">
+                </div>
+
+            <div class="mt-8 bg-gray-800 p-6 rounded-xl border border-gray-700 text-center">
+                <h3 class="text-lg font-bold mb-2 text-green-400">Cooldown Timer</h3>
+                <div id="timer-display" class="text-5xl font-mono mb-4">01:00</div>
+                <div class="flex gap-2 justify-center">
+                    <button onclick="startTimer()" class="bg-green-600 px-6 py-2 rounded-full font-bold">START</button>
+                    <button onclick="resetTimer()" class="bg-red-600 px-6 py-2 rounded-full font-bold">RESET</button>
+                </div>
+            </div>
+
+            <div class="bg-blue-900/30 p-4 rounded-lg border border-blue-500 mt-6">
+                <h3 class="font-bold text-blue-300">🧘 Ending Stretches</h3>
+                <p class="text-sm italic">Cobra Stretch, Pigeon Pose, Child's Pose</p>
+            </div>
+        </section>
+
+        <section id="pbs-sec" class="hidden">
+            <div class="bg-gray-800 p-4 rounded-lg mb-6">
+                <h3 class="font-bold mb-4">Add New Personal Best</h3>
+                <input type="text" id="pb-name" placeholder="Exercise (e.g. 5k Run)" class="w-full bg-gray-700 p-2 rounded mb-2 border-none">
+                <input type="text" id="pb-val" placeholder="Result (e.g. 22:30 or 50kg)" class="w-full bg-gray-700 p-2 rounded mb-4 border-none">
+                <button onclick="savePB()" class="w-full bg-blue-600 p-2 rounded font-bold uppercase tracking-wider">Save Achievement</button>
+            </div>
+
+            <div id="pb-display" class="space-y-2">
+                </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- DATA ---
+        const workouts = {
+            1: ["Pushups: 3 sets to failure", "Dips: 3 x 12", "Inverted Rows: 3 x 10"],
+            2: ["Bodyweight Squats: 4 x 20", "Lunges: 3 x 12 per leg", "Glute Bridges: 3 x 15"],
+            3: ["Plank: 3 x 60s", "Burpees: 3 x 10", "Mountain Climbers: 3 x 30s"]
+        };
+
+        // --- NAVIGATION ---
+        function showSection(sec) {
+            document.getElementById('workout-sec').classList.toggle('hidden', sec !== 'workout');
+            document.getElementById('pbs-sec').classList.toggle('hidden', sec !== 'pbs');
+            document.getElementById('btn-workout').classList.toggle('active-tab', sec === 'workout');
+            document.getElementById('btn-pbs').classList.toggle('active-tab', sec === 'pbs');
+        }
+
+        // --- WORKOUT LOGIC ---
+        function loadWorkout() {
+            const day = document.getElementById('day-select').value;
+            const list = document.getElementById('exercise-list');
+            list.innerHTML = workouts[day].map(ex => `
+                <div class="flex items-center bg-gray-800 p-4 rounded-lg border-l-4 border-blue-500">
+                    <input type="checkbox" class="w-6 h-6 mr-4">
+                    <span>${ex}</span>
+                </div>
+            `).join('');
+        }
+
+        // --- TIMER LOGIC ---
+        let timer;
+        let timeLeft = 60;
+        function startTimer() {
+            clearInterval(timer);
+            timer = setInterval(() => {
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert("Cooldown Finished!");
+                    return;
+                }
+                timeLeft--;
+                updateTimerDisplay();
+            }, 1000);
+        }
+        function resetTimer() {
+            clearInterval(timer);
+            timeLeft = 60;
+            updateTimerDisplay();
+        }
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('timer-display').innerText = 
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // --- PB LOGIC ---
+        function savePB() {
+            const name = document.getElementById('pb-name').value;
+            const val = document.getElementById('pb-val').value;
+            if(!name || !val) return;
+            
+            const pbs = JSON.parse(localStorage.getItem('myPBs') || '[]');
+            pbs.push({ name, val, date: new Date().toLocaleDateString() });
+            localStorage.setItem('myPBs', JSON.stringify(pbs));
+            
+            document.getElementById('pb-name').value = '';
+            document.getElementById('pb-val').value = '';
+            displayPBs();
+        }
+
+        function displayPBs() {
+            const pbs = JSON.parse(localStorage.getItem('myPBs') || '[]');
+            document.getElementById('pb-display').innerHTML = pbs.map((pb, index) => `
+                <div class="bg-gray-800 p-3 rounded flex justify-between items-center border border-gray-700">
+                    <div>
+                        <div class="font-bold text-blue-400">${pb.name}</div>
+                        <div class="text-xl">${pb.val}</div>
+                        <div class="text-xs text-gray-500">${pb.date}</div>
+                    </div>
+                    <button onclick="deletePB(${index})" class="text-gray-600 hover:text-red-500 text-sm">Delete</button>
+                </div>
+            `).reverse().join('');
+        }
+
+        function deletePB(index) {
+            let pbs = JSON.parse(localStorage.getItem('myPBs'));
+            pbs.splice(pbs.length - 1 - index, 1);
+            localStorage.setItem('myPBs', JSON.stringify(pbs));
+            displayPBs();
+        }
+
+        // Init
+        loadWorkout();
+        displayPBs();
+    </script>
+</body>
+</html>

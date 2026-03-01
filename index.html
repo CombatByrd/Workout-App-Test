@@ -58,4 +58,269 @@
             border-radius: 15px;
             margin-bottom: 20px;
             border: 1px solid var(--accent);
-            box-shadow: 0 4px 15
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h3 { margin-top: 0; font-size: 1.1rem; color: var(--primary); }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-box { text-align: center; }
+        .stat-box h4 { margin: 0; font-size: 0.7rem; color: #888; text-transform: uppercase; }
+        .stat-box p { margin: 5px 0 0; font-size: 1.2rem; font-weight: bold; }
+
+        /* Calendar Grid */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 10px; }
+        .day { padding: 8px 0; font-size: 0.7rem; border-radius: 5px; background: var(--accent); }
+        .day.has-data { border: 1px solid var(--primary); color: var(--primary); font-weight: bold; }
+        .day.today { background: var(--primary); color: #000; font-weight: bold; }
+
+        /* Form Elements */
+        input, select {
+            width: 100%; padding: 12px; margin-bottom: 10px;
+            background: var(--accent); border: 1px solid transparent;
+            border-radius: 8px; color: var(--text); box-sizing: border-box;
+        }
+
+        .btn-main {
+            width: 100%; padding: 14px; background: var(--primary);
+            color: #000; border: none; border-radius: 8px;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-main:active { transform: scale(0.98); }
+
+        /* PR Dashboard */
+        .pr-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .pr-box { background: var(--accent); padding: 10px; border-radius: 8px; text-align: center; }
+        .pr-box label { font-size: 0.6rem; color: #888; display: block; }
+        .pr-box span { font-size: 0.9rem; font-weight: bold; }
+
+        /* Workout List */
+        .workout-list { list-style: none; padding: 0; }
+        .workout-item {
+            background: var(--card); margin-bottom: 10px; padding: 15px;
+            border-radius: 10px; display: flex; justify-content: space-between;
+            align-items: center; border-left: 5px solid var(--primary);
+        }
+
+        #timer-display { text-align: center; padding: 10px; border: 1px dashed var(--primary); border-radius: 10px; margin-bottom: 15px; }
+    </style>
+</head>
+<body data-theme="dark">
+
+<div class="container">
+    <div class="header-actions">
+        <h2 style="margin:0">IronTrack <span style="color:var(--primary)">ULTRA</span></h2>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+    </div>
+
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+            <h3 id="month-name">Month Year</h3>
+        </div>
+        <div class="calendar-grid" id="calendar-days"></div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="card stat-box"><h4>Total Sets</h4><p id="stat-count">0</p></div>
+        <div class="card stat-box"><h4>Volume (kg)</h4><p id="stat-volume">0</p></div>
+    </div>
+
+    <div class="card">
+        <h3>🏃 Cardio Personal Bests</h3>
+        <div class="pr-grid">
+            <div class="pr-box"><label>1 Mile</label><span id="best-mile">--:--</span></div>
+            <div class="pr-box"><label>5K</label><span id="best-5k">--:--</span></div>
+            <div class="pr-box"><label>10K</label><span id="best-10k">--:--</span></div>
+        </div>
+        <div style="display:flex; gap:5px; margin-top:10px;">
+            <select id="run-type" style="flex:1">
+                <option value="mile">1 Mile</option>
+                <option value="5k">5K</option>
+                <option value="10k">10K</option>
+            </select>
+            <input type="text" id="run-time" placeholder="MM:SS" style="flex:1">
+            <button onclick="updatePR()" style="background:var(--primary); border:none; border-radius:8px; padding:0 10px; cursor:pointer;">Set</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>🍎 Daily Nutrition</h3>
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="cal-input" placeholder="Today's Calories">
+            <button class="btn-main" style="width:100px" onclick="logCalories()">Save</button>
+        </div>
+        <p id="cal-display" style="font-size:0.8rem; color:#888; margin:5px 0 0 0;">Today: 0 kcal</p>
+    </div>
+
+    <div class="card">
+        <h3>💪 Log Workout</h3>
+        <div id="timer-display">
+            <div id="timer-clock" style="font-size:1.5rem; font-weight:bold;">00:00</div>
+            <small>Rest Timer</small>
+        </div>
+        <input type="text" id="ex-name" placeholder="Exercise Name">
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="ex-sets" placeholder="Sets">
+            <input type="number" id="ex-reps" placeholder="Reps">
+        </div>
+        <select id="ex-cat">
+            <option value="Push">Push</option>
+            <option value="Pull">Pull</option>
+            <option value="Legs">Legs</option>
+            <option value="Cardio">Cardio</option>
+        </select>
+        <button class="btn-main" onclick="addWorkout()">LOG SET & START REST</button>
+    </div>
+
+    <ul id="workout-list" class="workout-list"></ul>
+
+    <div style="text-align:center; margin-top:20px;">
+        <button onclick="exportCSV()" style="background:none; border:1px solid var(--primary); color:var(--primary); padding:10px; border-radius:8px; cursor:pointer;">📥 Export Data to CSV</button>
+    </div>
+</div>
+
+<script>
+    // INITIALIZATION
+    document.addEventListener('DOMContentLoaded', () => {
+        render();
+        renderCalendar();
+        loadPRs();
+        updateCalorieDisplay();
+        if(localStorage.getItem('theme')) document.body.setAttribute('data-theme', localStorage.getItem('theme'));
+    });
+
+    // THEME ENGINE
+    function toggleTheme() {
+        const body = document.body;
+        const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    }
+
+    // WORKOUT LOGIC
+    function addWorkout() {
+        const name = document.getElementById('ex-name').value;
+        const s = document.getElementById('ex-sets').value;
+        const r = document.getElementById('ex-reps').value;
+        const cat = document.getElementById('ex-cat').value;
+        if(!name || !s || !r) return alert("Fill all fields");
+
+        const entry = {
+            id: Date.now(),
+            date: new Date().toLocaleDateString(),
+            name, sets: s, reps: r, cat, vol: s * r
+        };
+
+        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
+        logs.push(entry);
+        localStorage.setItem('ultraLogs', JSON.stringify(logs));
+        
+        render();
+        renderCalendar();
+        startTimer(60);
+        document.getElementById('ex-sets').value = '';
+        document.getElementById('ex-reps').value = '';
+    }
+
+    function render() {
+        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
+        const list = document.getElementById('workout-list');
+        document.getElementById('stat-count').innerText = logs.length;
+        document.getElementById('stat-volume').innerText = logs.reduce((a, b) => a + b.vol, 0).toLocaleString();
+
+        list.innerHTML = logs.map(w => `
+            <li class="workout-item">
+                <div>
+                    <strong>${w.name}</strong><br>
+                    <small>${w.sets}x${w.reps} • ${w.cat} • ${w.date}</small>
+                </div>
+                <button onclick="deleteItem(${w.id})" style="background:none; border:none; color:var(--danger); cursor:pointer;">✕</button>
+            </li>
+        `).reverse().join('');
+    }
+
+    function deleteItem(id) {
+        let logs = JSON.parse(localStorage.getItem('ultraLogs'));
+        localStorage.setItem('ultraLogs', JSON.stringify(logs.filter(l => l.id !== id)));
+        render();
+        renderCalendar();
+    }
+
+    // CALENDAR LOGIC
+    function renderCalendar() {
+        const grid = document.getElementById('calendar-days');
+        const now = new Date();
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        document.getElementById('month-name').innerText = months[now.getMonth()];
+
+        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
+        const loggedDates = logs.map(l => l.date);
+
+        let html = "";
+        for (let i = 1; i <= lastDay; i++) {
+            const fullDate = `${now.getMonth() + 1}/${i}/${now.getFullYear()}`;
+            const isToday = i === now.getDate() ? "today" : "";
+            const hasData = loggedDates.includes(fullDate) ? "has-data" : "";
+            html += `<div class="day ${isToday} ${hasData}">${i}</div>`;
+        }
+        grid.innerHTML = html;
+    }
+
+    // PR & NUTRITION LOGIC
+    function updatePR() {
+        const type = document.getElementById('run-type').value;
+        const time = document.getElementById('run-time').value;
+        const prs = JSON.parse(localStorage.getItem('runPRs') || '{}');
+        prs[type] = time;
+        localStorage.setItem('runPRs', JSON.stringify(prs));
+        loadPRs();
+    }
+
+    function loadPRs() {
+        const prs = JSON.parse(localStorage.getItem('runPRs') || '{}');
+        document.getElementById('best-mile').innerText = prs.mile || '--:--';
+        document.getElementById('best-5k').innerText = prs['5k'] || '--:--';
+        document.getElementById('best-10k').innerText = prs['10k'] || '--:--';
+    }
+
+    function logCalories() {
+        const cals = document.getElementById('cal-input').value;
+        const nutrition = JSON.parse(localStorage.getItem('nutriLogs') || '{}');
+        nutrition[new Date().toLocaleDateString()] = cals;
+        localStorage.setItem('nutriLogs', JSON.stringify(nutrition));
+        updateCalorieDisplay();
+    }
+
+    function updateCalorieDisplay() {
+        const nutrition = JSON.parse(localStorage.getItem('nutriLogs') || '{}');
+        const today = new Date().toLocaleDateString();
+        document.getElementById('cal-display').innerText = `Today: ${nutrition[today] || 0} kcal`;
+    }
+
+    // TIMER
+    let timerInt;
+    function startTimer(sec) {
+        clearInterval(timerInt);
+        let t = sec;
+        timerInt = setInterval(() => {
+            let m = Math.floor(t / 60); let s = t % 60;
+            document.getElementById('timer-clock').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+            if (t-- <= 0) { clearInterval(timerInt); alert("Rest over!"); }
+        }, 1000);
+    }
+
+    // EXPORT
+    function exportCSV() {
+        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
+        let csv = "Date,Exercise,Sets,Reps,Volume\n" + logs.map(l => `${l.date},${l.name},${l.sets},${l.reps},${l.vol}`).join("\n");
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'workout_data.csv');
+        a.click();
+    }
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronBot: Total Command</title>
+    <title>IronBot: Ultimate Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -25,23 +25,24 @@
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
         .resting .eye { height: 1px; } .working .mouth { height: 8px; width: 8px; border-radius: 50%; }
         .working .arm-l { transform: rotate(130deg); } .working .arm-r { transform: rotate(-140deg); }
-        .bubble { position: absolute; top: 0; right: 0; background: white; color: black; padding: 8px 12px; border-radius: 15px 15px 15px 0; font-size: 0.7rem; font-weight: 900; max-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .bubble { position: absolute; top: 0; right: 0; background: white; color: black; padding: 8px 12px; border-radius: 15px 15px 15px 0; font-size: 0.7rem; font-weight: 900; max-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10; }
 
         /* --- CALENDAR --- */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
+        .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         .cal-day { aspect-ratio: 1; background: #0d1117; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; cursor: pointer; border: 1px solid #1f242b; }
         .cal-day.logged { background: rgba(57, 211, 83, 0.2); border-color: var(--bright-green); color: var(--bright-green); }
         .cal-day.selected { border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
 
-        /* --- CARDS & UI --- */
+        /* --- UI --- */
         .glass-card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border-radius: 20px; padding: 18px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.08); }
-        h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 10px; }
+        h3 { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 10px; }
         .btn-cyber { padding: 12px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.2s; }
-        .btn-sync-small { background: var(--bot-glow); color: #000; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; cursor: pointer; }
-        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 10px; border-radius: 10px; width: 100%; box-sizing: border-box; margin-bottom: 8px; }
+        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 10px; border-radius: 10px; width: 100%; box-sizing: border-box; margin-bottom: 8px; font-family: 'Outfit'; }
         
         .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; border-bottom: 1px solid #1f242b; padding-bottom: 4px; }
         .stat-val { color: var(--bot-glow); font-weight: 800; }
+        .pr-input { width: 60px !important; margin: 0 !important; padding: 4px !important; font-size: 0.7rem !important; text-align: right; }
 
         .nav-bar { position: fixed; bottom: 15px; left: 10px; right: 10px; background: #161b22; border-radius: 25px; height: 65px; display: flex; justify-content: space-around; align-items: center; border: 1px solid #333; z-index: 1000; }
         .nav-item { color: #8b949e; background: none; border: none; font-size: 0.6rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
@@ -60,20 +61,35 @@
                 <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
                 <div class="mouth"></div>
             </div>
-            <div class="bubble" id="bot-speech">SYNC THE CALENDAR, HUMAN.</div>
+            <div class="bubble" id="bot-speech">CALIBRATED & READY.</div>
         </div>
 
         <div class="glass-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3>Command Calendar</h3>
-                <span id="cal-mo" style="font-size:0.6rem; color:var(--primary); font-weight:900;"></span>
+            <div class="cal-nav">
+                <button onclick="changeMonth(-1)" style="background:none; border:none; color:white; cursor:pointer;">◀</button>
+                <h3 id="cal-mo-yr" style="margin:0;"></h3>
+                <button onclick="changeMonth(1)" style="background:none; border:none; color:white; cursor:pointer;">▶</button>
             </div>
             <div class="cal-grid" id="calendar"></div>
             <p id="selected-date-info" style="font-size:0.6rem; color:#888; margin-top:10px; text-align:center;">Selected: Today</p>
         </div>
 
         <div class="glass-card">
-            <h3>Daily Mission Protocol</h3>
+            <div style="display:flex; gap:8px;">
+                <div style="flex:1;">
+                    <h3>Daily Weight</h3>
+                    <input type="number" id="today-w" placeholder="Lbs">
+                </div>
+                <div style="flex:1;">
+                    <h3>Daily Fuel</h3>
+                    <input type="number" id="today-f" placeholder="Calories">
+                </div>
+            </div>
+            <button class="btn-cyber" style="background:var(--fuel); color:#000; font-size:0.7rem;" onclick="saveDailyVitals()">Sync Weight & Fuel</button>
+        </div>
+
+        <div class="glass-card">
+            <h3>Mission Protocol</h3>
             <div id="mission-list"></div>
         </div>
 
@@ -94,34 +110,26 @@
                 <button id="m-w" class="btn-cyber" style="font-size:0.55rem; background:var(--card); color:var(--bot-glow)" onclick="setM('w')">Weights</button>
                 <button id="m-c" class="btn-cyber" style="font-size:0.55rem; background:none; color:#666" onclick="setM('c')">Cardio</button>
             </div>
-            <input id="ex-n" placeholder="Exercise / Activity Name">
+            <input id="ex-n" placeholder="Exercise Name">
             <div id="w-in" style="display:flex; gap:8px;"><input type="number" id="ex-s" placeholder="Sets"><input type="number" id="ex-r" placeholder="Reps"><input type="number" id="ex-lb" placeholder="Lbs"></div>
             <div id="c-in" style="display:none; gap:8px;"><input type="number" id="ex-t" placeholder="Min"><input type="number" id="ex-d" placeholder="Miles"></div>
             <button class="btn-cyber" style="background:var(--primary); color:white; margin-top:5px;" onclick="logD()">Sync Data</button>
         </div>
-
-        <div class="glass-card">
-            <h3>Daily Fueling</h3>
-            <div style="display:flex; gap:8px;">
-                <input type="number" id="fuel-in" placeholder="Calories In">
-                <button class="btn-cyber" style="width:100px; background:var(--fuel); color:#000;" onclick="saveFuel()">Log Fuel</button>
-            </div>
-        </div>
     </section>
 
     <section id="page-stats" class="page">
-        <h2>Mission Intel</h2>
+        <h2>Intelligence</h2>
         <div class="glass-card">
             <h3>Weight Trend</h3>
-            <canvas id="wGraph" style="width:100%; height:140px;"></canvas>
+            <canvas id="wGraph" style="width:100%; height:160px;"></canvas>
         </div>
         <div class="glass-card">
             <h3>Core Metrics</h3>
             <div class="stat-row"><span>Total Volume</span><span class="stat-val" id="stat-vol">0 lbs</span></div>
             <div class="stat-row"><span>Monthly Distance</span><span class="stat-val" id="stat-mi">0 mi</span></div>
-            <div class="stat-row"><span>1 Mile PR</span><span class="stat-val" id="pr-1">--</span></div>
-            <div class="stat-row"><span>5K PR</span><span class="stat-val" id="pr-5">--</span></div>
-            <div class="stat-row"><span>10K PR</span><span class="stat-val" id="pr-10">--</span></div>
+            <div class="stat-row"><span>1 Mile PR (min)</span><input class="pr-input" id="pr-1" onchange="manualPR('pr1', this.value)"></div>
+            <div class="stat-row"><span>5K PR (min)</span><input class="pr-input" id="pr-5" onchange="manualPR('pr5', this.value)"></div>
+            <div class="stat-row"><span>10K PR (min)</span><input class="pr-input" id="pr-10" onchange="manualPR('pr10', this.value)"></div>
         </div>
         <div id="hist-list"></div>
     </section>
@@ -133,10 +141,10 @@
     </section>
     
     <section id="page-set" class="page">
-        <h2>Calibration</h2>
+        <h2>System Calibration</h2>
         <div class="glass-card">
-            <label>Current Weight (lbs)</label><input type="number" id="set-w">
-            <button class="btn-cyber" style="background:var(--primary); color:white;" onclick="saveSet()">Update Weight</button>
+            <p style="font-size:0.7rem; color:#888;">Note: Weight and Fuel are now on the 'Today' page for quick access.</p>
+            <button class="btn-cyber" style="background:var(--danger); color:white;" onclick="localStorage.clear(); location.reload();">Hard Reset Data</button>
         </div>
     </section>
 </div>
@@ -154,10 +162,12 @@
         {n:"DB Bench Press", m:"Chest", i:"Drive DBs from shoulder width to center."},
         {n:"DB Single Row", m:"Back", i:"Pull DB to hip. Keep back flat."},
         {n:"DB Hammer Curl", m:"Arms", i:"Palms inward. Control the weight."},
-        {n:"DB Lateral Raise", m:"Shoulders", i:"Raise arms to the side, slight elbow bend."}
+        {n:"Run", m:"Cardio", i:"The baseline for endurance."}
     ];
 
-    let mode = 'w', tSec = 90, tRun = false, tInt, selectedDate = new Date().toLocaleDateString();
+    let mode = 'w', tSec = 90, tRun = false, tInt;
+    let currDate = new Date();
+    let selectedDate = new Date().toLocaleDateString();
 
     function speak(t) { document.getElementById('bot-speech').innerText = t; }
 
@@ -169,17 +179,23 @@
         if(p==='stats') renderStats();
     }
 
-    // --- FUNCTIONAL CALENDAR ---
+    // --- CALENDAR WITH NAV ---
+    function changeMonth(dir) {
+        currDate.setMonth(currDate.getMonth() + dir);
+        renderCal();
+    }
+
     function renderCal() {
         const cal = document.getElementById('calendar');
-        const now = new Date();
-        const daysInMo = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+        const year = currDate.getFullYear();
+        const month = currDate.getMonth();
+        const daysInMo = new Date(year, month + 1, 0).getDate();
         const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
         
-        document.getElementById('cal-mo').innerText = now.toLocaleString('default', { month: 'long' }).toUpperCase();
+        document.getElementById('cal-mo-yr').innerText = currDate.toLocaleString('default', { month: 'long', year: 'numeric' }).toUpperCase();
         cal.innerHTML = '';
         for(let i=1; i<=daysInMo; i++) {
-            const dateStr = new Date(now.getFullYear(), now.getMonth(), i).toLocaleDateString();
+            const dateStr = new Date(year, month, i).toLocaleDateString();
             const isLogged = logs.some(l => l.d === dateStr);
             const isSelected = selectedDate === dateStr;
             cal.innerHTML += `<div class="cal-day active ${isLogged?'logged':''} ${isSelected?'selected':''}" onclick="selectDate('${dateStr}')">${i}</div>`;
@@ -190,10 +206,22 @@
         selectedDate = d;
         document.getElementById('selected-date-info').innerText = `Target Date: ${d}`;
         renderCal();
-        speak(`SWITCHING TO ${d}.`);
+        speak(`DATE JUMP: ${d}`);
     }
 
-    // --- MISSION SYNC ---
+    // --- TODAY PAGE VITALS ---
+    function saveDailyVitals() {
+        const w = document.getElementById('today-w').value;
+        const f = document.getElementById('today-f').value;
+        const v = JSON.parse(localStorage.getItem('uVit')||'{}');
+        if(!v[selectedDate]) v[selectedDate] = {};
+        if(w) v[selectedDate].w = w;
+        if(f) v[selectedDate].f = f;
+        localStorage.setItem('uVit', JSON.stringify(v));
+        speak("BIOMETRICS SYNCED.");
+    }
+
+    // --- MISSIONS ---
     function initM() {
         let missions = JSON.parse(localStorage.getItem('currMissions'));
         const today = new Date().toLocaleDateString();
@@ -203,81 +231,61 @@
             localStorage.setItem('currMissions', JSON.stringify(missions));
         }
         document.getElementById('mission-list').innerHTML = missions.data.map((m,i)=>`
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:0.8rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:0.75rem;">
                 <span>${m.done?'✅':'⬜'} ${m.n}</span>
-                <button class="btn-sync-small" onclick="addMissionToLog('${m.n}', ${i})">ADD TO LOG</button>
+                <button onclick="addM('${m.n}')" style="background:var(--bot-glow); border:none; border-radius:4px; font-weight:900; font-size:0.5rem; padding:4px;">SYNC</button>
             </div>
         `).join('');
     }
 
-    function addMissionToLog(name, index) {
-        document.getElementById('ex-n').value = name;
-        setM(name.includes("Run") ? 'c' : 'w');
-        speak("MISSION ADDED TO TRACKER.");
+    function addM(n) { 
+        document.getElementById('ex-n').value = n; 
+        if(n === "Run") setM('c'); else setM('w');
+        speak("MISSION LOADED.");
     }
 
     // --- LOGGING ---
     function setM(m) { 
-        mode=m; document.getElementById('w-in').style.display=m==='w'?'flex':'none'; document.getElementById('c-in').style.display=m==='c'?'flex':'none'; 
+        mode=m; 
+        document.getElementById('w-in').style.display=m==='w'?'flex':'none'; 
+        document.getElementById('c-in').style.display=m==='c'?'flex':'none';
+        if(m==='c') document.getElementById('ex-n').value = "Run";
     }
 
     function logD() {
         const n = document.getElementById('ex-n').value; if(!n) return;
         const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
-        const entry = {id:Date.now(), d:selectedDate, n, c:mode==='c', 
-                      s:document.getElementById('ex-s').value, r:document.getElementById('ex-r').value, lb:document.getElementById('ex-lb').value,
-                      t:document.getElementById('ex-t').value, m:document.getElementById('ex-d').value};
-        logs.push(entry);
+        logs.push({id:Date.now(), d:selectedDate, n, c:mode==='c', 
+                   s:document.getElementById('ex-s').value, r:document.getElementById('ex-r').value, lb:document.getElementById('ex-lb').value,
+                   t:document.getElementById('ex-t').value, m:document.getElementById('ex-d').value});
         localStorage.setItem('uLogs', JSON.stringify(logs));
+        
+        // CLEAR FIELDS
+        ['ex-n','ex-s','ex-r','ex-lb','ex-t','ex-d'].forEach(id => document.getElementById(id).value = '');
+        if(mode==='c') document.getElementById('ex-n').value = "Run";
+        
         document.getElementById('bot-scene').classList.add('working');
-        speak("DATA COMMITTED.");
+        speak("SYNC COMPLETE. FORM SECURED.");
         setTimeout(()=> { document.getElementById('bot-scene').classList.remove('working'); renderCal(); }, 1000);
     }
 
-    function saveFuel() {
-        const cal = document.getElementById('fuel-in').value; if(!cal) return;
-        const v = JSON.parse(localStorage.getItem('uVit')||'{}');
-        if(!v[selectedDate]) v[selectedDate] = {};
-        v[selectedDate].f = cal;
-        localStorage.setItem('uVit', JSON.stringify(v));
-        speak(`${cal} CALORIES DIGESTED.`);
-    }
-
-    function saveSet() {
-        const w = document.getElementById('set-w').value; if(!w) return;
-        const v = JSON.parse(localStorage.getItem('uVit')||'{}');
-        if(!v[selectedDate]) v[selectedDate] = {};
-        v[selectedDate].w = w;
-        localStorage.setItem('uVit', JSON.stringify(v));
-        speak("MASS REGISTERED.");
-    }
-
     // --- ANALYTICS ---
+    function manualPR(key, val) { localStorage.setItem(key, val); }
+
     function renderStats() {
         const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
-        let totalVol = 0, totalDist = 0;
-        let p1 = Infinity, p5 = Infinity, p10 = Infinity;
-
+        let vol = 0, dist = 0;
         logs.forEach(l => {
-            if(!l.c) {
-                totalVol += (parseInt(l.s)||0) * (parseInt(l.r)||0) * (parseInt(l.lb)||0);
-            } else {
-                const dist = parseFloat(l.m)||0;
-                totalDist += dist;
-                const time = parseFloat(l.t)||0;
-                if(dist >= 1 && dist < 2) p1 = Math.min(p1, time);
-                if(dist >= 3.1 && dist < 4) p5 = Math.min(p5, time);
-                if(dist >= 6.2) p10 = Math.min(p10, time);
-            }
+            if(!l.c) vol += (parseInt(l.s)||0)*(parseInt(l.r)||0)*(parseInt(l.lb)||0);
+            else dist += parseFloat(l.m)||0;
         });
 
-        document.getElementById('stat-vol').innerText = totalVol.toLocaleString() + " lbs";
-        document.getElementById('stat-mi').innerText = totalDist.toFixed(1) + " mi";
-        document.getElementById('pr-1').innerText = p1 === Infinity ? "--" : p1 + "m";
-        document.getElementById('pr-5').innerText = p5 === Infinity ? "--" : p5 + "m";
-        document.getElementById('pr-10').innerText = p10 === Infinity ? "--" : p10 + "m";
-
-        document.getElementById('hist-list').innerHTML = logs.reverse().slice(0,5).map(l => `<div class="glass-card" style="font-size:0.7rem;">${l.n} - ${l.d}</div>`).join('');
+        document.getElementById('stat-vol').innerText = vol.toLocaleString() + " lbs";
+        document.getElementById('stat-mi').innerText = dist.toFixed(1) + " mi";
+        document.getElementById('pr-1').value = localStorage.getItem('pr1') || "";
+        document.getElementById('pr-5').value = localStorage.getItem('pr5') || "";
+        document.getElementById('pr-10').value = localStorage.getItem('pr10') || "";
+        
         renderG();
     }
 
@@ -285,13 +293,28 @@
         const c = document.getElementById('wGraph'); const ctx = c.getContext('2d');
         const v = JSON.parse(localStorage.getItem('uVit')||'{}');
         const data = Object.keys(v).filter(k=>v[k].w).map(d=>({x:new Date(d), y:parseFloat(v[d].w)})).sort((a,b)=>a.x-b.x);
-        ctx.clearRect(0,0,c.width,c.height); if(data.length<2) return;
-        const minW = Math.min(...data.map(d=>d.y))-1, maxW = Math.max(...data.map(d=>d.y))+1;
+        
+        ctx.clearRect(0,0,c.width,c.height);
+        if(data.length < 1) return;
+
+        const minW = Math.min(...data.map(d=>d.y))-2, maxW = Math.max(...data.map(d=>d.y))+2;
+        const padding = 30;
+        
         ctx.beginPath(); ctx.strokeStyle="#39d353"; ctx.lineWidth=3;
-        data.forEach((p,i)=>{ const x=(i/(data.length-1))*c.width, y=c.height-((p.y-minW)/(maxW-minW))*c.height; if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke();
+        data.forEach((p,i)=>{
+            const x = padding + (i/(data.length-1 || 1))*(c.width - padding*2);
+            const y = (c.height - padding) - ((p.y-minW)/(maxW-minW || 1))*(c.height - padding*2);
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            
+            // Draw Data Labels
+            ctx.fillStyle = "#fff"; ctx.font = "10px Outfit";
+            ctx.fillText(p.y, x - 10, y - 10);
+            ctx.arc(x,y,3,0,Math.PI*2);
+        });
+        ctx.stroke();
     }
 
-    // --- TIMER & LIB ---
+    // --- BOILERPLATE ---
     function adjT(v) { tSec = Math.max(0, tSec+v); updateT(); }
     function toggleT() {
         const sc = document.getElementById('bot-scene');
@@ -300,7 +323,7 @@
     }
     function updateT() { let m=Math.floor(tSec/60), s=tSec%60; document.getElementById('timer-display').innerText = `${m}:${s<10?'0'+s:s}`; }
     function renderL(q="") {
-        document.getElementById('lib-list').innerHTML = db.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).map(x=>`<div class="glass-card"><strong>${x.n}</strong><br><small>${x.i}</small><br><button class="btn-sync-small" onclick="addMissionToLog('${x.n}',0)">SYNC</button></div>`).join('');
+        document.getElementById('lib-list').innerHTML = db.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).map(x=>`<div class="glass-card"><strong>${x.n}</strong><br><small>${x.i}</small><br><button onclick="addM('${x.n}')" style="background:var(--bot-glow); border:none; padding:5px; border-radius:5px; font-weight:900; margin-top:5px;">SYNC</button></div>`).join('');
     }
 
     renderCal(); initM(); renderL();

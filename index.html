@@ -3,323 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronTrack Ultra - All-in-One</title>
+    <title>IronTrack Ultra - Final Polish</title>
     <style>
-        /* 1. THEME & CORE DESIGN */
         :root {
-            --bg: #121212;
-            --card: #1e1e1e;
-            --text: #ffffff;
-            --primary: #00ff88;
-            --accent: #333;
-            --danger: #ff4444;
+            --bg: #121212; --card: #1e1e1e; --text: #ffffff;
+            --primary: #00ff88; --accent: #333; --danger: #ff4444; --rest: #3498db;
         }
-
         [data-theme="light"] {
-            --bg: #f4f7f6;
-            --card: #ffffff;
-            --text: #1a1a1a;
-            --primary: #00b361;
-            --accent: #e0e0e0;
+            --bg: #f4f7f6; --card: #ffffff; --text: #1a1a1a;
+            --primary: #00b361; --accent: #e0e0e0; --rest: #2980b9;
         }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; transition: 0.3s; }
+        .container { width: 100%; max-width: 500px; margin: auto; padding: 15px; box-sizing: border-box; }
+        .card { background: var(--card); padding: 18px; border-radius: 15px; margin-bottom: 15px; border: 1px solid var(--accent); position: relative; }
+        h3 { margin-top: 0; color: var(--primary); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            transition: all 0.3s ease;
-            margin: 0;
-            padding-bottom: 50px;
-        }
+        /* Calendar Styling */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .day { padding: 8px 0; font-size: 0.7rem; border-radius: 5px; background: var(--accent); cursor: pointer; text-align: center; border: 1px solid transparent; }
+        .day.has-data { border-color: var(--primary); }
+        .day.is-rest { border-color: var(--rest); color: var(--rest); font-weight: bold; }
+        .day.selected { background: var(--primary); color: #000; font-weight: bold; }
 
-        .container { width: 100%; max-width: 500px; margin: auto; padding: 20px; box-sizing: border-box; }
+        /* Momentum Chart */
+        .summary-bar-container { display: flex; align-items: flex-end; justify-content: space-between; height: 60px; gap: 5px; margin-top: 10px; }
+        .bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .bar { width: 100%; background: var(--primary); border-radius: 2px 2px 0 0; min-height: 2px; }
 
-        .header-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+        /* Workout Item & Edit UI */
+        .workout-item { background: var(--accent); margin-bottom: 8px; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .edit-input { background: #000; color: var(--primary); border: 1px solid var(--primary); width: 40px; text-align: center; border-radius: 4px; }
 
-        .theme-toggle {
-            background: var(--accent);
-            border: none;
-            color: var(--text);
-            padding: 8px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        /* 2. COMPONENT STYLES */
-        .card {
-            background: var(--card);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            border: 1px solid var(--accent);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        h3 { margin-top: 0; font-size: 1.1rem; color: var(--primary); }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-box { text-align: center; }
-        .stat-box h4 { margin: 0; font-size: 0.7rem; color: #888; text-transform: uppercase; }
-        .stat-box p { margin: 5px 0 0; font-size: 1.2rem; font-weight: bold; }
-
-        /* Calendar Grid */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-top: 10px; }
-        .day { padding: 8px 0; font-size: 0.7rem; border-radius: 5px; background: var(--accent); }
-        .day.has-data { border: 1px solid var(--primary); color: var(--primary); font-weight: bold; }
-        .day.today { background: var(--primary); color: #000; font-weight: bold; }
-
-        /* Form Elements */
-        input, select {
-            width: 100%; padding: 12px; margin-bottom: 10px;
-            background: var(--accent); border: 1px solid transparent;
-            border-radius: 8px; color: var(--text); box-sizing: border-box;
-        }
-
-        .btn-main {
-            width: 100%; padding: 14px; background: var(--primary);
-            color: #000; border: none; border-radius: 8px;
-            font-weight: bold; cursor: pointer; transition: 0.2s;
-        }
-        .btn-main:active { transform: scale(0.98); }
-
-        /* PR Dashboard */
-        .pr-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .pr-box { background: var(--accent); padding: 10px; border-radius: 8px; text-align: center; }
-        .pr-box label { font-size: 0.6rem; color: #888; display: block; }
-        .pr-box span { font-size: 0.9rem; font-weight: bold; }
-
-        /* Workout List */
-        .workout-list { list-style: none; padding: 0; }
-        .workout-item {
-            background: var(--card); margin-bottom: 10px; padding: 15px;
-            border-radius: 10px; display: flex; justify-content: space-between;
-            align-items: center; border-left: 5px solid var(--primary);
-        }
-
-        #timer-display { text-align: center; padding: 10px; border: 1px dashed var(--primary); border-radius: 10px; margin-bottom: 15px; }
+        /* Inputs & Buttons */
+        input, select { width: 100%; padding: 10px; margin-bottom: 8px; background: var(--accent); border: none; border-radius: 8px; color: var(--text); box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 12px; background: var(--primary); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-rest { background: var(--rest); color: white; margin-top: 5px; }
+        
+        .live-tracker { background: var(--accent); padding: 15px; border-radius: 10px; text-align: center; }
+        .set-dots { display: flex; justify-content: center; gap: 8px; margin: 10px 0; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #555; }
+        .dot.done { background: var(--primary); }
     </style>
 </head>
 <body data-theme="dark">
 
 <div class="container">
-    <div class="header-actions">
-        <h2 style="margin:0">IronTrack <span style="color:var(--primary)">ULTRA</span></h2>
-        <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h2 style="margin:0; font-size:1.4rem;">IronTrack <span style="color:var(--primary)">ULTRA</span></h2>
+        <button onclick="toggleTheme()" style="background:var(--accent); border:none; color:var(--text); padding:5px 12px; border-radius:20px; cursor:pointer;">🌓</button>
     </div>
 
     <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center">
-            <h3 id="month-name">Month Year</h3>
+        <h3>Weekly Momentum</h3>
+        <div class="summary-bar-container" id="weekly-chart"></div>
+    </div>
+
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <button onclick="changeMonth(-1)" style="color:var(--text); background:none; border:none; cursor:pointer;">◀</button>
+            <h4 id="month-display" style="margin:0; font-size:0.9rem;"></h4>
+            <button onclick="changeMonth(1)" style="color:var(--text); background:none; border:none; cursor:pointer;">▶</button>
         </div>
         <div class="calendar-grid" id="calendar-days"></div>
-    </div>
-
-    <div class="stats-grid">
-        <div class="card stat-box"><h4>Total Sets</h4><p id="stat-count">0</p></div>
-        <div class="card stat-box"><h4>Volume (kg)</h4><p id="stat-volume">0</p></div>
+        <button class="btn-main btn-rest" onclick="toggleRestDay()">Toggle Rest Day</button>
     </div>
 
     <div class="card">
-        <h3>🏃 Cardio Personal Bests</h3>
-        <div class="pr-grid">
-            <div class="pr-box"><label>1 Mile</label><span id="best-mile">--:--</span></div>
-            <div class="pr-box"><label>5K</label><span id="best-5k">--:--</span></div>
-            <div class="pr-box"><label>10K</label><span id="best-10k">--:--</span></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3>💪 Training</h3>
+            <button onclick="generateRoutine()" style="font-size:0.6rem; border:1px solid var(--primary); background:none; color:var(--primary); padding:2px 5px; border-radius:4px; cursor:pointer;">Suggest</button>
         </div>
-        <div style="display:flex; gap:5px; margin-top:10px;">
-            <select id="run-type" style="flex:1">
-                <option value="mile">1 Mile</option>
-                <option value="5k">5K</option>
-                <option value="10k">10K</option>
-            </select>
-            <input type="text" id="run-time" placeholder="MM:SS" style="flex:1">
-            <button onclick="updatePR()" style="background:var(--primary); border:none; border-radius:8px; padding:0 10px; cursor:pointer;">Set</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>🍎 Daily Nutrition</h3>
+        <div id="timer-display" style="text-align:center; font-size:1.8rem; font-weight:bold; color:var(--primary); margin-bottom:10px;">00:00</div>
+        
+        <input list="ex-lib" id="ex-name" placeholder="Exercise Name">
+        <datalist id="ex-lib"></datalist>
+        
         <div style="display:flex; gap:10px;">
-            <input type="number" id="cal-input" placeholder="Today's Calories">
-            <button class="btn-main" style="width:100px" onclick="logCalories()">Save</button>
-        </div>
-        <p id="cal-display" style="font-size:0.8rem; color:#888; margin:5px 0 0 0;">Today: 0 kcal</p>
-    </div>
-
-    <div class="card">
-        <h3>💪 Log Workout</h3>
-        <div id="timer-display">
-            <div id="timer-clock" style="font-size:1.5rem; font-weight:bold;">00:00</div>
-            <small>Rest Timer</small>
-        </div>
-        <input type="text" id="ex-name" placeholder="Exercise Name">
-        <div style="display:flex; gap:10px;">
-            <input type="number" id="ex-sets" placeholder="Sets">
+            <input type="number" id="ex-target-sets" placeholder="Sets" oninput="updateDots()">
             <input type="number" id="ex-reps" placeholder="Reps">
         </div>
-        <select id="ex-cat">
-            <option value="Push">Push</option>
-            <option value="Pull">Pull</option>
-            <option value="Legs">Legs</option>
-            <option value="Cardio">Cardio</option>
-        </select>
-        <button class="btn-main" onclick="addWorkout()">LOG SET & START REST</button>
+
+        <div class="live-tracker">
+            <div id="set-info" style="font-size:0.8rem; margin-bottom:5px;">Set 1</div>
+            <div class="set-dots" id="set-dots"></div>
+            <button id="set-btn" class="btn-main" onclick="completeSet()">START SET</button>
+        </div>
     </div>
 
-    <ul id="workout-list" class="workout-list"></ul>
-
-    <div style="text-align:center; margin-top:20px;">
-        <button onclick="exportCSV()" style="background:none; border:1px solid var(--primary); color:var(--primary); padding:10px; border-radius:8px; cursor:pointer;">📥 Export Data to CSV</button>
-    </div>
+    <ul id="workout-list" style="padding:0; list-style:none;"></ul>
 </div>
 
 <script>
-    // INITIALIZATION
-    document.addEventListener('DOMContentLoaded', () => {
-        render();
+    let currentViewDate = new Date();
+    let selectedDate = new Date().toLocaleDateString();
+    let currentSet = 1;
+    let timerInt;
+
+    // --- AUDIO SYNTHESIS (The Polish) ---
+    function playDing() {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = context.createOscillator();
+        const gain = context.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, context.currentTime); // High A note
+        gain.gain.setValueAtTime(0, context.currentTime);
+        gain.gain.linearRampToValueAtTime(0.5, context.currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 1);
+        osc.connect(gain);
+        gain.connect(context.destination);
+        osc.start();
+        osc.stop(context.currentTime + 1);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    function init() {
+        renderAll();
+        // Load custom lib and merge with defaults
+        const lib = [...[{name:"Pushups"},{name:"Squats"},{name:"Pullups"}], ...JSON.parse(localStorage.getItem('customLib') || '[]')];
+        document.getElementById('ex-lib').innerHTML = lib.map(e => `<option value="${e.name}">`).join('');
+    }
+
+    function renderAll() {
         renderCalendar();
-        loadPRs();
-        updateCalorieDisplay();
+        renderWorkouts();
+        renderWeeklySummary();
         if(localStorage.getItem('theme')) document.body.setAttribute('data-theme', localStorage.getItem('theme'));
-    });
-
-    // THEME ENGINE
-    function toggleTheme() {
-        const body = document.body;
-        const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        body.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
     }
 
-    // WORKOUT LOGIC
-    function addWorkout() {
-        const name = document.getElementById('ex-name').value;
-        const s = document.getElementById('ex-sets').value;
-        const r = document.getElementById('ex-reps').value;
-        const cat = document.getElementById('ex-cat').value;
-        if(!name || !s || !r) return alert("Fill all fields");
-
-        const entry = {
-            id: Date.now(),
-            date: new Date().toLocaleDateString(),
-            name, sets: s, reps: r, cat, vol: s * r
-        };
-
-        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        logs.push(entry);
-        localStorage.setItem('ultraLogs', JSON.stringify(logs));
-        
-        render();
-        renderCalendar();
-        startTimer(60);
-        document.getElementById('ex-sets').value = '';
-        document.getElementById('ex-reps').value = '';
-    }
-
-    function render() {
-        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        const list = document.getElementById('workout-list');
-        document.getElementById('stat-count').innerText = logs.length;
-        document.getElementById('stat-volume').innerText = logs.reduce((a, b) => a + b.vol, 0).toLocaleString();
-
-        list.innerHTML = logs.map(w => `
-            <li class="workout-item">
-                <div>
-                    <strong>${w.name}</strong><br>
-                    <small>${w.sets}x${w.reps} • ${w.cat} • ${w.date}</small>
-                </div>
-                <button onclick="deleteItem(${w.id})" style="background:none; border:none; color:var(--danger); cursor:pointer;">✕</button>
-            </li>
-        `).reverse().join('');
-    }
-
-    function deleteItem(id) {
-        let logs = JSON.parse(localStorage.getItem('ultraLogs'));
-        localStorage.setItem('ultraLogs', JSON.stringify(logs.filter(l => l.id !== id)));
-        render();
-        renderCalendar();
-    }
-
-    // CALENDAR LOGIC
+    // --- CALENDAR & REST DAY ---
     function renderCalendar() {
         const grid = document.getElementById('calendar-days');
-        const now = new Date();
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        document.getElementById('month-name').innerText = months[now.getMonth()];
-
-        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        document.getElementById('month-display').innerText = `${months[currentViewDate.getMonth()]} ${currentViewDate.getFullYear()}`;
+        
+        const lastDay = new Date(currentViewDate.getFullYear(), currentViewDate.getMonth() + 1, 0).getDate();
         const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        const loggedDates = logs.map(l => l.date);
+        const rests = JSON.parse(localStorage.getItem('restDays') || '[]');
 
         let html = "";
         for (let i = 1; i <= lastDay; i++) {
-            const fullDate = `${now.getMonth() + 1}/${i}/${now.getFullYear()}`;
-            const isToday = i === now.getDate() ? "today" : "";
-            const hasData = loggedDates.includes(fullDate) ? "has-data" : "";
-            html += `<div class="day ${isToday} ${hasData}">${i}</div>`;
+            const dateStr = new Date(currentViewDate.getFullYear(), currentViewDate.getMonth(), i).toLocaleDateString();
+            const hasData = logs.some(l => l.date === dateStr) ? "has-data" : "";
+            const isRest = rests.includes(dateStr) ? "is-rest" : "";
+            const isSelected = dateStr === selectedDate ? "selected" : "";
+            html += `<div class="day ${hasData} ${isRest} ${isSelected}" onclick="selectDate('${dateStr}')">${i}</div>`;
         }
         grid.innerHTML = html;
     }
 
-    // PR & NUTRITION LOGIC
-    function updatePR() {
-        const type = document.getElementById('run-type').value;
-        const time = document.getElementById('run-time').value;
-        const prs = JSON.parse(localStorage.getItem('runPRs') || '{}');
-        prs[type] = time;
-        localStorage.setItem('runPRs', JSON.stringify(prs));
-        loadPRs();
+    function toggleRestDay() {
+        let rests = JSON.parse(localStorage.getItem('restDays') || '[]');
+        if (rests.includes(selectedDate)) {
+            rests = rests.filter(d => d !== selectedDate);
+        } else {
+            rests.push(selectedDate);
+        }
+        localStorage.setItem('restDays', JSON.stringify(rests));
+        renderCalendar();
     }
 
-    function loadPRs() {
-        const prs = JSON.parse(localStorage.getItem('runPRs') || '{}');
-        document.getElementById('best-mile').innerText = prs.mile || '--:--';
-        document.getElementById('best-5k').innerText = prs['5k'] || '--:--';
-        document.getElementById('best-10k').innerText = prs['10k'] || '--:--';
+    function selectDate(d) { selectedDate = d; renderAll(); }
+    function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); }
+
+    // --- WORKOUT LOGIC & EDITING ---
+    function completeSet() {
+        const name = document.getElementById('ex-name').value;
+        const target = parseInt(document.getElementById('ex-target-sets').value);
+        const reps = document.getElementById('ex-reps').value;
+        if(!name || !target || !reps) return;
+
+        if(currentSet >= target) {
+            saveWorkout(name, target, reps);
+            resetTracker();
+        } else {
+            currentSet++;
+            startTimer(60);
+            updateDots();
+        }
     }
 
-    function logCalories() {
-        const cals = document.getElementById('cal-input').value;
-        const nutrition = JSON.parse(localStorage.getItem('nutriLogs') || '{}');
-        nutrition[new Date().toLocaleDateString()] = cals;
-        localStorage.setItem('nutriLogs', JSON.stringify(nutrition));
-        updateCalorieDisplay();
+    function saveWorkout(name, sets, reps) {
+        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
+        logs.push({ id: Date.now(), date: selectedDate, name, sets, reps, vol: sets * reps });
+        localStorage.setItem('ultraLogs', JSON.stringify(logs));
+        renderAll();
     }
 
-    function updateCalorieDisplay() {
-        const nutrition = JSON.parse(localStorage.getItem('nutriLogs') || '{}');
-        const today = new Date().toLocaleDateString();
-        document.getElementById('cal-display').innerText = `Today: ${nutrition[today] || 0} kcal`;
+    function renderWorkouts() {
+        const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
+        const filtered = logs.filter(l => l.date === selectedDate);
+        const list = document.getElementById('workout-list');
+        list.innerHTML = filtered.map(w => `
+            <li class="workout-item">
+                <div>
+                    <input class="edit-input" type="number" value="${w.sets}" onchange="editLog(${w.id}, 'sets', this.value)"> x 
+                    <input class="edit-input" type="number" value="${w.reps}" onchange="editLog(${w.id}, 'reps', this.value)">
+                    <strong style="margin-left:10px">${w.name}</strong>
+                </div>
+                <button onclick="deleteLog(${w.id})" style="background:none; border:none; color:var(--danger); cursor:pointer;">✕</button>
+            </li>
+        `).join('');
     }
 
-    // TIMER
-    let timerInt;
+    function editLog(id, field, val) {
+        let logs = JSON.parse(localStorage.getItem('ultraLogs'));
+        const idx = logs.findIndex(l => l.id === id);
+        logs[idx][field] = parseInt(val);
+        logs[idx].vol = logs[idx].sets * logs[idx].reps;
+        localStorage.setItem('ultraLogs', JSON.stringify(logs));
+        renderWeeklySummary();
+    }
+
+    function deleteLog(id) {
+        let logs = JSON.parse(localStorage.getItem('ultraLogs'));
+        localStorage.setItem('ultraLogs', JSON.stringify(logs.filter(l => l.id !== id)));
+        renderAll();
+    }
+
+    // --- TOOLS ---
     function startTimer(sec) {
         clearInterval(timerInt);
         let t = sec;
         timerInt = setInterval(() => {
-            let m = Math.floor(t / 60); let s = t % 60;
-            document.getElementById('timer-clock').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-            if (t-- <= 0) { clearInterval(timerInt); alert("Rest over!"); }
+            let m = Math.floor(t/60); let s = t%60;
+            document.getElementById('timer-clock').innerText = `${m}:${s<10?'0'+s:s}`;
+            if(t-- <= 0) { clearInterval(timerInt); playDing(); alert("Rest Finished!"); }
         }, 1000);
     }
 
-    // EXPORT
-    function exportCSV() {
+    function renderWeeklySummary() {
         const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        let csv = "Date,Exercise,Sets,Reps,Volume\n" + logs.map(l => `${l.date},${l.name},${l.sets},${l.reps},${l.vol}`).join("\n");
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.setAttribute('href', url);
-        a.setAttribute('download', 'workout_data.csv');
-        a.click();
+        const chart = document.getElementById('weekly-chart');
+        let days = [];
+        for(let i=6; i>=0; i--) {
+            const d = new Date(); d.setDate(d.getDate()-i);
+            const vol = logs.filter(l => l.date === d.toLocaleDateString()).reduce((a,b)=>a+b.vol, 0);
+            days.push(vol);
+        }
+        const max = Math.max(...days, 1);
+        chart.innerHTML = days.map(v => `<div class="bar-wrapper"><div class="bar" style="height:${(v/max)*100}%"></div></div>`).join('');
+    }
+
+    function updateDots() {
+        const target = document.getElementById('ex-target-sets').value || 0;
+        document.getElementById('set-dots').innerHTML = Array.from({length:target}, (_,i) => `<div class="dot ${i < currentSet-1 ? 'done' : ''}"></div>`).join('');
+        document.getElementById('set-info').innerText = `Set ${currentSet} of ${target}`;
+        document.getElementById('set-btn').innerText = currentSet >= target ? "LOG FINAL SET" : "FINISH SET";
+    }
+
+    function resetTracker() {
+        currentSet = 1; document.getElementById('ex-name').value = ''; document.getElementById('ex-target-sets').value = ''; document.getElementById('ex-reps').value = '';
+        updateDots(); clearInterval(timerInt); document.getElementById('timer-display').innerText = "00:00";
+    }
+
+    function toggleTheme() {
+        const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-theme', t); localStorage.setItem('theme', t);
     }
 </script>
 </body>

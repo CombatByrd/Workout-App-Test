@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronBot: Ultimate Command</title>
+    <title>IronBot: Perpetual Guardian</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,81 +11,83 @@
             --primary: #58a6ff; --bot-glow: #00ffcc; --rest: #79c0ff;
             --danger: #ff7b72; --bright-green: #39d353; --fuel: #f1c40f;
         }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 110px; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-top: 200px; padding-bottom: 110px; }
         .container { width: 100%; max-width: 450px; margin: auto; padding: 20px; box-sizing: border-box; }
 
-        /* --- BOT VISUALS --- */
-        .bot-scene { height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .bot-body { width: 65px; height: 65px; background: #30363d; border: 3px solid var(--bot-glow); border-radius: 20px; position: relative; animation: float 3s infinite ease-in-out; }
+        /* --- STICKY BOT --- */
+        .bot-frame { position: fixed; top: 0; left: 0; right: 0; height: 180px; background: var(--bg); z-index: 2000; border-bottom: 1px solid #333; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .bot-scene { position: relative; width: 100%; display: flex; justify-content: center; align-items: center; }
+        .bot-body { width: 60px; height: 60px; background: #30363d; border: 3px solid var(--bot-glow); border-radius: 20px; position: relative; animation: float 3s infinite ease-in-out; }
         .arm { width: 10px; height: 30px; background: #30363d; border: 2px solid var(--bot-glow); position: absolute; border-radius: 10px; top: 15px; transition: 0.4s; }
         .arm-l { left: -18px; transform-origin: top right; } .arm-r { right: -18px; transform-origin: top left; }
         .eyes { display: flex; justify-content: space-around; width: 30px; margin: 18px auto 5px; }
         .eye { width: 7px; height: 7px; background: var(--bot-glow); border-radius: 50%; box-shadow: 0 0 8px var(--bot-glow); }
-        .mouth { width: 12px; height: 3px; background: var(--bot-glow); margin: 5px auto; border-radius: 10px; transition: 0.2s; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .mouth { width: 12px; height: 3px; background: var(--bot-glow); margin: 5px auto; border-radius: 10px; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .resting .eye { height: 1px; } .working .mouth { height: 8px; width: 8px; border-radius: 50%; }
-        .working .arm-l { transform: rotate(130deg); } .working .arm-r { transform: rotate(-140deg); }
-        .bubble { position: absolute; top: 0; right: 0; background: white; color: black; padding: 8px 12px; border-radius: 15px 15px 15px 0; font-size: 0.7rem; font-weight: 900; max-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10; }
+        .working .arm-l { transform: rotate(130deg); } .working .arm-r { transform: rotate(-130deg); }
+        .bubble { position: absolute; top: 20px; right: 20px; background: white; color: black; padding: 8px 12px; border-radius: 15px 15px 15px 0; font-size: 0.7rem; font-weight: 900; max-width: 140px; }
+        .streak-badge { position: absolute; top: 20px; left: 20px; color: var(--fuel); font-weight: 900; font-size: 0.8rem; text-align: center; }
 
         /* --- CALENDAR --- */
         .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         .cal-day { aspect-ratio: 1; background: #0d1117; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; cursor: pointer; border: 1px solid #1f242b; }
         .cal-day.logged { background: rgba(57, 211, 83, 0.2); border-color: var(--bright-green); color: var(--bright-green); }
-        .cal-day.selected { border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        .cal-day.rest-day { background: rgba(121, 192, 255, 0.2); border-color: var(--rest); color: var(--rest); }
+        .cal-day.selected { border-color: var(--primary); box-shadow: 0 0 8px var(--primary); }
 
-        /* --- UI --- */
-        .glass-card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border-radius: 20px; padding: 18px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.08); }
+        /* --- UI ELEMENTS --- */
+        .glass-card { background: rgba(22, 27, 34, 0.8); border-radius: 20px; padding: 18px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.08); }
         h3 { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 10px; }
-        .btn-cyber { padding: 12px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.2s; }
         input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 10px; border-radius: 10px; width: 100%; box-sizing: border-box; margin-bottom: 8px; font-family: 'Outfit'; }
-        
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; border-bottom: 1px solid #1f242b; padding-bottom: 4px; }
-        .stat-val { color: var(--bot-glow); font-weight: 800; }
-        .pr-input { width: 60px !important; margin: 0 !important; padding: 4px !important; font-size: 0.7rem !important; text-align: right; }
-
-        .nav-bar { position: fixed; bottom: 15px; left: 10px; right: 10px; background: #161b22; border-radius: 25px; height: 65px; display: flex; justify-content: space-around; align-items: center; border: 1px solid #333; z-index: 1000; }
-        .nav-item { color: #8b949e; background: none; border: none; font-size: 0.6rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .btn-cyber { padding: 12px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.2s; font-family: 'Outfit'; }
+        .nav-bar { position: fixed; bottom: 15px; left: 10px; right: 10px; background: #161b22; border-radius: 25px; height: 65px; display: flex; justify-content: space-around; align-items: center; border: 1px solid #333; z-index: 3000; }
+        .nav-item { color: #8b949e; background: none; border: none; font-size: 0.6rem; display: flex; flex-direction: column; align-items: center; }
         .nav-item.active { color: var(--bot-glow); }
-        .page { display: none; } .page.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page { display: none; } .page.active { display: block; }
+        
+        /* Stats Table */
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; border-bottom: 1px solid #1f242b; padding-bottom: 4px; }
+        .pr-input { width: 50px !important; margin: 0 !important; padding: 2px !important; text-align: right; }
     </style>
 </head>
 <body>
 
+<div class="bot-frame">
+    <div class="streak-badge">🔥 <span id="streak-val">0</span><br><small>STREAK</small></div>
+    <div class="bot-scene" id="bot-scene">
+        <div class="bot-body">
+            <div class="arm arm-l"></div><div class="arm arm-r"></div>
+            <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+            <div class="mouth"></div>
+        </div>
+        <div class="bubble" id="bot-speech">EYES ON THE PRIZE, HUMAN.</div>
+    </div>
+    <div style="font-size: 0.6rem; color: var(--bot-glow); font-weight: 800;">IRONBOT v4.0 ACTIVE</div>
+</div>
+
 <div class="container">
     <section id="page-today" class="page active">
-        <div class="bot-scene" id="bot-scene">
-            <div class="bot-body" id="iron-bot">
-                <div class="arm arm-l"></div><div class="arm arm-r"></div>
-                <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
-                <div class="mouth"></div>
-            </div>
-            <div class="bubble" id="bot-speech">CALIBRATED & READY.</div>
-        </div>
-
         <div class="glass-card">
             <div class="cal-nav">
-                <button onclick="changeMonth(-1)" style="background:none; border:none; color:white; cursor:pointer;">◀</button>
-                <h3 id="cal-mo-yr" style="margin:0;"></h3>
-                <button onclick="changeMonth(1)" style="background:none; border:none; color:white; cursor:pointer;">▶</button>
+                <button onclick="changeMonth(-1)">◀</button>
+                <h3 id="cal-mo-yr"></h3>
+                <button onclick="changeMonth(1)">▶</button>
             </div>
             <div class="cal-grid" id="calendar"></div>
-            <p id="selected-date-info" style="font-size:0.6rem; color:#888; margin-top:10px; text-align:center;">Selected: Today</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <p id="selected-date-info" style="font-size:0.6rem; color:#888;">Selected: Today</p>
+                <button class="btn-cyber" style="width:100px; font-size:0.6rem; background:var(--rest); color:black;" onclick="toggleRestDay()">SET REST DAY</button>
+            </div>
         </div>
 
         <div class="glass-card">
             <div style="display:flex; gap:8px;">
-                <div style="flex:1;">
-                    <h3>Daily Weight</h3>
-                    <input type="number" id="today-w" placeholder="Lbs">
-                </div>
-                <div style="flex:1;">
-                    <h3>Daily Fuel</h3>
-                    <input type="number" id="today-f" placeholder="Calories">
-                </div>
+                <div style="flex:1;"><h3>Weight</h3><input type="number" id="today-w" placeholder="Lbs"></div>
+                <div style="flex:1;"><h3>Calories</h3><input type="number" id="today-f" placeholder="In"></div>
             </div>
-            <button class="btn-cyber" style="background:var(--fuel); color:#000; font-size:0.7rem;" onclick="saveDailyVitals()">Sync Weight & Fuel</button>
+            <button class="btn-cyber" style="background:var(--fuel); color:black; font-size:0.7rem;" onclick="saveDaily()">Sync Vitals</button>
         </div>
 
         <div class="glass-card">
@@ -107,29 +109,25 @@
         <div class="glass-card">
             <h3>Log Entry</h3>
             <div style="display:flex; gap:5px; margin-bottom:8px;">
-                <button id="m-w" class="btn-cyber" style="font-size:0.55rem; background:var(--card); color:var(--bot-glow)" onclick="setM('w')">Weights</button>
-                <button id="m-c" class="btn-cyber" style="font-size:0.55rem; background:none; color:#666" onclick="setM('c')">Cardio</button>
+                <button id="m-w" class="btn-cyber" style="font-size:0.5rem; background:var(--card); color:var(--bot-glow)" onclick="setM('w')">Weights</button>
+                <button id="m-c" class="btn-cyber" style="font-size:0.5rem; background:none; color:#666" onclick="setM('c')">Cardio</button>
             </div>
             <input id="ex-n" placeholder="Exercise Name">
             <div id="w-in" style="display:flex; gap:8px;"><input type="number" id="ex-s" placeholder="Sets"><input type="number" id="ex-r" placeholder="Reps"><input type="number" id="ex-lb" placeholder="Lbs"></div>
             <div id="c-in" style="display:none; gap:8px;"><input type="number" id="ex-t" placeholder="Min"><input type="number" id="ex-d" placeholder="Miles"></div>
-            <button class="btn-cyber" style="background:var(--primary); color:white; margin-top:5px;" onclick="logD()">Sync Data</button>
+            <button class="btn-cyber" style="background:var(--primary); color:white;" onclick="logD()">Sync Session</button>
         </div>
     </section>
 
     <section id="page-stats" class="page">
         <h2>Intelligence</h2>
+        <div class="glass-card"><h3>Weight Trend</h3><canvas id="wGraph" style="width:100%; height:160px;"></canvas></div>
         <div class="glass-card">
-            <h3>Weight Trend</h3>
-            <canvas id="wGraph" style="width:100%; height:160px;"></canvas>
-        </div>
-        <div class="glass-card">
-            <h3>Core Metrics</h3>
-            <div class="stat-row"><span>Total Volume</span><span class="stat-val" id="stat-vol">0 lbs</span></div>
-            <div class="stat-row"><span>Monthly Distance</span><span class="stat-val" id="stat-mi">0 mi</span></div>
-            <div class="stat-row"><span>1 Mile PR (min)</span><input class="pr-input" id="pr-1" onchange="manualPR('pr1', this.value)"></div>
-            <div class="stat-row"><span>5K PR (min)</span><input class="pr-input" id="pr-5" onchange="manualPR('pr5', this.value)"></div>
-            <div class="stat-row"><span>10K PR (min)</span><input class="pr-input" id="pr-10" onchange="manualPR('pr10', this.value)"></div>
+            <h3>Metrics</h3>
+            <div class="stat-row"><span>Total Vol</span><span id="st-vol">0</span></div>
+            <div class="stat-row"><span>Monthly Mi</span><span id="st-mi">0</span></div>
+            <div class="stat-row"><span>1 Mile PR</span><input class="pr-input" id="pr-1" onchange="mPR('pr1', this.value)"></div>
+            <div class="stat-row"><span>5K PR</span><input class="pr-input" id="pr-5" onchange="mPR('pr5', this.value)"></div>
         </div>
         <div id="hist-list"></div>
     </section>
@@ -139,35 +137,27 @@
         <input type="text" placeholder="Search movements..." oninput="renderL(this.value)">
         <div id="lib-list"></div>
     </section>
-    
-    <section id="page-set" class="page">
-        <h2>System Calibration</h2>
-        <div class="glass-card">
-            <p style="font-size:0.7rem; color:#888;">Note: Weight and Fuel are now on the 'Today' page for quick access.</p>
-            <button class="btn-cyber" style="background:var(--danger); color:white;" onclick="localStorage.clear(); location.reload();">Hard Reset Data</button>
-        </div>
-    </section>
 </div>
 
 <nav class="nav-bar">
     <button class="nav-item active" onclick="showP('today', this)"><span>🤖</span>Today</button>
     <button class="nav-item" onclick="showP('stats', this)"><span>📊</span>Stats</button>
     <button class="nav-item" onclick="showP('lib', this)"><span>📚</span>Lib</button>
-    <button class="nav-item" onclick="showP('set', this)"><span>⚙️</span>Set</button>
 </nav>
 
 <script>
     const db = [
         {n:"DB Goblet Squat", m:"Legs", i:"Cup DB at chest height. Keep heels down."},
         {n:"DB Bench Press", m:"Chest", i:"Drive DBs from shoulder width to center."},
-        {n:"DB Single Row", m:"Back", i:"Pull DB to hip. Keep back flat."},
-        {n:"DB Hammer Curl", m:"Arms", i:"Palms inward. Control the weight."},
-        {n:"Run", m:"Cardio", i:"The baseline for endurance."}
+        {n:"DB Single Row", m:"Back", i:"Pull DB to hip. Back flat."},
+        {n:"DB Hammer Curl", m:"Arms", i:"Palms inward. No swinging."},
+        {n:"DB Shoulder Press", m:"Shoulders", i:"Drive weights overhead from ear height."},
+        {n:"DB Lateral Raise", m:"Shoulders", i:"Raise to sides, slight elbow bend."},
+        {n:"DB Lunges", m:"Legs", i:"Step forward, drop back knee to floor."},
+        {n:"Run", m:"Cardio", i:"Baseline endurance training."}
     ];
 
-    let mode = 'w', tSec = 90, tRun = false, tInt;
-    let currDate = new Date();
-    let selectedDate = new Date().toLocaleDateString();
+    let mode='w', tSec=90, tRun=false, tInt, currDate=new Date(), selectedDate=new Date().toLocaleDateString();
 
     function speak(t) { document.getElementById('bot-speech').innerText = t; }
 
@@ -179,113 +169,83 @@
         if(p==='stats') renderStats();
     }
 
-    // --- CALENDAR WITH NAV ---
-    function changeMonth(dir) {
-        currDate.setMonth(currDate.getMonth() + dir);
-        renderCal();
-    }
-
     function renderCal() {
         const cal = document.getElementById('calendar');
         const year = currDate.getFullYear();
         const month = currDate.getMonth();
-        const daysInMo = new Date(year, month + 1, 0).getDate();
+        const daysInMo = new Date(year, month+1, 0).getDate();
         const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
+        const rests = JSON.parse(localStorage.getItem('uRests')||'[]');
         
-        document.getElementById('cal-mo-yr').innerText = currDate.toLocaleString('default', { month: 'long', year: 'numeric' }).toUpperCase();
+        document.getElementById('cal-mo-yr').innerText = currDate.toLocaleString('default', { month:'long', year:'numeric' }).toUpperCase();
         cal.innerHTML = '';
-        for(let i=1; i<=daysInMo; i++) {
-            const dateStr = new Date(year, month, i).toLocaleDateString();
-            const isLogged = logs.some(l => l.d === dateStr);
-            const isSelected = selectedDate === dateStr;
-            cal.innerHTML += `<div class="cal-day active ${isLogged?'logged':''} ${isSelected?'selected':''}" onclick="selectDate('${dateStr}')">${i}</div>`;
+        for(let i=1; i<=daysInMo; i++){
+            const dStr = new Date(year, month, i).toLocaleDateString();
+            const isL = logs.some(l => l.d === dStr);
+            const isR = rests.includes(dStr);
+            const isS = selectedDate === dStr;
+            cal.innerHTML += `<div class="cal-day ${isL?'logged':''} ${isR?'rest-day':''} ${isS?'selected':''}" onclick="selD('${dStr}')">${i}</div>`;
         }
+        calcStreak();
     }
 
-    function selectDate(d) {
-        selectedDate = d;
-        document.getElementById('selected-date-info').innerText = `Target Date: ${d}`;
+    function selD(d) { selectedDate=d; document.getElementById('selected-date-info').innerText=`Target: ${d}`; renderCal(); speak(`BROWSING ${d}`); }
+
+    function toggleRestDay() {
+        let rests = JSON.parse(localStorage.getItem('uRests')||'[]');
+        if(rests.includes(selectedDate)) rests = rests.filter(d => d !== selectedDate);
+        else rests.push(selectedDate);
+        localStorage.setItem('uRests', JSON.stringify(rests));
         renderCal();
-        speak(`DATE JUMP: ${d}`);
+        speak("REST PROTOCOL UPDATED.");
     }
 
-    // --- TODAY PAGE VITALS ---
-    function saveDailyVitals() {
-        const w = document.getElementById('today-w').value;
-        const f = document.getElementById('today-f').value;
-        const v = JSON.parse(localStorage.getItem('uVit')||'{}');
-        if(!v[selectedDate]) v[selectedDate] = {};
-        if(w) v[selectedDate].w = w;
-        if(f) v[selectedDate].f = f;
-        localStorage.setItem('uVit', JSON.stringify(v));
-        speak("BIOMETRICS SYNCED.");
-    }
-
-    // --- MISSIONS ---
-    function initM() {
-        let missions = JSON.parse(localStorage.getItem('currMissions'));
-        const today = new Date().toLocaleDateString();
-        if(!missions || missions.date !== today) {
-            const shuf = [...db].sort(()=>0.5-Math.random()).slice(0,3);
-            missions = { date: today, data: shuf.map(x => ({n:x.n, done:false})) };
-            localStorage.setItem('currMissions', JSON.stringify(missions));
+    function calcStreak() {
+        const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
+        const dates = [...new Set(logs.map(l => l.d))].sort((a,b)=>new Date(b)-new Date(a));
+        let streak = 0; let check = new Date();
+        while(true) {
+            if(dates.includes(check.toLocaleDateString())) { streak++; check.setDate(check.getDate()-1); }
+            else break;
         }
-        document.getElementById('mission-list').innerHTML = missions.data.map((m,i)=>`
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:0.75rem;">
-                <span>${m.done?'✅':'⬜'} ${m.n}</span>
-                <button onclick="addM('${m.n}')" style="background:var(--bot-glow); border:none; border-radius:4px; font-weight:900; font-size:0.5rem; padding:4px;">SYNC</button>
-            </div>
-        `).join('');
+        document.getElementById('streak-val').innerText = streak;
     }
 
-    function addM(n) { 
-        document.getElementById('ex-n').value = n; 
-        if(n === "Run") setM('c'); else setM('w');
-        speak("MISSION LOADED.");
+    function saveDaily() {
+        const w = document.getElementById('today-w').value, f = document.getElementById('today-f').value;
+        const v = JSON.parse(localStorage.getItem('uVit')||'{}');
+        if(!v[selectedDate]) v[selectedDate]={};
+        if(w) v[selectedDate].w = w; if(f) v[selectedDate].f = f;
+        localStorage.setItem('uVit', JSON.stringify(v));
+        speak("VITALS COMMITTED.");
     }
 
-    // --- LOGGING ---
+    function addM(n) { document.getElementById('ex-n').value=n; setM(n==='Run'?'c':'w'); speak("MISSION SYNCED."); }
+
     function setM(m) { 
-        mode=m; 
-        document.getElementById('w-in').style.display=m==='w'?'flex':'none'; 
-        document.getElementById('c-in').style.display=m==='c'?'flex':'none';
-        if(m==='c') document.getElementById('ex-n').value = "Run";
+        mode=m; document.getElementById('w-in').style.display=m==='w'?'flex':'none'; document.getElementById('c-in').style.display=m==='c'?'flex':'none';
+        if(m==='c') document.getElementById('ex-n').value="Run";
     }
 
     function logD() {
         const n = document.getElementById('ex-n').value; if(!n) return;
         const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
-        logs.push({id:Date.now(), d:selectedDate, n, c:mode==='c', 
-                   s:document.getElementById('ex-s').value, r:document.getElementById('ex-r').value, lb:document.getElementById('ex-lb').value,
-                   t:document.getElementById('ex-t').value, m:document.getElementById('ex-d').value});
+        logs.push({id:Date.now(), d:selectedDate, n, c:mode==='c', s:document.getElementById('ex-s').value, r:document.getElementById('ex-r').value, lb:document.getElementById('ex-lb').value, t:document.getElementById('ex-t').value, m:document.getElementById('ex-d').value});
         localStorage.setItem('uLogs', JSON.stringify(logs));
-        
-        // CLEAR FIELDS
         ['ex-n','ex-s','ex-r','ex-lb','ex-t','ex-d'].forEach(id => document.getElementById(id).value = '');
-        if(mode==='c') document.getElementById('ex-n').value = "Run";
-        
         document.getElementById('bot-scene').classList.add('working');
-        speak("SYNC COMPLETE. FORM SECURED.");
+        speak("SESSION LOGGED.");
         setTimeout(()=> { document.getElementById('bot-scene').classList.remove('working'); renderCal(); }, 1000);
     }
 
-    // --- ANALYTICS ---
-    function manualPR(key, val) { localStorage.setItem(key, val); }
-
     function renderStats() {
         const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
-        let vol = 0, dist = 0;
-        logs.forEach(l => {
-            if(!l.c) vol += (parseInt(l.s)||0)*(parseInt(l.r)||0)*(parseInt(l.lb)||0);
-            else dist += parseFloat(l.m)||0;
-        });
-
-        document.getElementById('stat-vol').innerText = vol.toLocaleString() + " lbs";
-        document.getElementById('stat-mi').innerText = dist.toFixed(1) + " mi";
-        document.getElementById('pr-1').value = localStorage.getItem('pr1') || "";
-        document.getElementById('pr-5').value = localStorage.getItem('pr5') || "";
-        document.getElementById('pr-10').value = localStorage.getItem('pr10') || "";
-        
+        let vol=0, dist=0;
+        logs.forEach(l => { if(!l.c) vol+=(parseInt(l.s)||0)*(parseInt(l.r)||0)*(parseInt(l.lb)||0); else dist+=parseFloat(l.m)||0; });
+        document.getElementById('st-vol').innerText=vol.toLocaleString()+" lbs";
+        document.getElementById('st-mi').innerText=dist.toFixed(1)+" mi";
+        document.getElementById('pr-1').value=localStorage.getItem('pr1')||"";
+        document.getElementById('pr-5').value=localStorage.getItem('pr5')||"";
         renderG();
     }
 
@@ -293,40 +253,40 @@
         const c = document.getElementById('wGraph'); const ctx = c.getContext('2d');
         const v = JSON.parse(localStorage.getItem('uVit')||'{}');
         const data = Object.keys(v).filter(k=>v[k].w).map(d=>({x:new Date(d), y:parseFloat(v[d].w)})).sort((a,b)=>a.x-b.x);
-        
-        ctx.clearRect(0,0,c.width,c.height);
-        if(data.length < 1) return;
-
-        const minW = Math.min(...data.map(d=>d.y))-2, maxW = Math.max(...data.map(d=>d.y))+2;
-        const padding = 30;
-        
+        ctx.clearRect(0,0,c.width,c.height); if(data.length<1) return;
+        const minW = Math.min(...data.map(d=>d.y))-2, maxW = Math.max(...data.map(d=>d.y))+2, pad=30;
         ctx.beginPath(); ctx.strokeStyle="#39d353"; ctx.lineWidth=3;
         data.forEach((p,i)=>{
-            const x = padding + (i/(data.length-1 || 1))*(c.width - padding*2);
-            const y = (c.height - padding) - ((p.y-minW)/(maxW-minW || 1))*(c.height - padding*2);
-            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-            
-            // Draw Data Labels
-            ctx.fillStyle = "#fff"; ctx.font = "10px Outfit";
-            ctx.fillText(p.y, x - 10, y - 10);
-            ctx.arc(x,y,3,0,Math.PI*2);
-        });
-        ctx.stroke();
+            const x=pad+(i/(data.length-1||1))*(c.width-pad*2), y=(c.height-pad)-((p.y-minW)/(maxW-minW||1))*(c.height-pad*2);
+            if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            ctx.fillStyle="#fff"; ctx.fillText(p.y, x-10, y-10);
+        }); ctx.stroke();
     }
 
-    // --- BOILERPLATE ---
-    function adjT(v) { tSec = Math.max(0, tSec+v); updateT(); }
-    function toggleT() {
-        const sc = document.getElementById('bot-scene');
-        if(tRun) { clearInterval(tInt); tRun=false; sc.classList.remove('resting'); }
-        else { tRun=true; sc.classList.add('resting'); tInt = setInterval(() => { tSec--; updateT(); if(tSec<=0) toggleT(); }, 1000); }
-    }
-    function updateT() { let m=Math.floor(tSec/60), s=tSec%60; document.getElementById('timer-display').innerText = `${m}:${s<10?'0'+s:s}`; }
     function renderL(q="") {
-        document.getElementById('lib-list').innerHTML = db.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).map(x=>`<div class="glass-card"><strong>${x.n}</strong><br><small>${x.i}</small><br><button onclick="addM('${x.n}')" style="background:var(--bot-glow); border:none; padding:5px; border-radius:5px; font-weight:900; margin-top:5px;">SYNC</button></div>`).join('');
+        document.getElementById('lib-list').innerHTML = db.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).map(x=>`
+            <div class="glass-card">
+                <div style="width:100%; height:80px; background:#000; border:1px solid var(--primary); border-radius:10px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:0.5rem;">[VIDEO FEED: ${x.n.toUpperCase()}]</div>
+                <strong>${x.n}</strong><br><small>${x.i}</small><br>
+                <button onclick="addM('${x.n}')" style="background:var(--bot-glow); border:none; padding:5px; border-radius:5px; font-weight:900; margin-top:5px;">SYNC</button>
+            </div>`).join('');
     }
 
-    renderCal(); initM(); renderL();
+    function changeMonth(d) { currDate.setMonth(currDate.getMonth()+d); renderCal(); }
+    function mPR(k,v) { localStorage.setItem(k,v); }
+    function adjT(v) { tSec=Math.max(0, tSec+v); updateT(); }
+    function toggleT() {
+        const sc=document.getElementById('bot-scene');
+        if(tRun){ clearInterval(tInt); tRun=false; sc.classList.remove('resting'); }
+        else { tRun=true; sc.classList.add('resting'); tInt=setInterval(()=>{ tSec--; updateT(); if(tSec<=0) toggleT(); },1000); }
+    }
+    function updateT() { let m=Math.floor(tSec/60), s=tSec%60; document.getElementById('timer-display').innerText=`${m}:${s<10?'0'+s:s}`; }
+    function initMission() {
+        const shuf = [...db].sort(()=>0.5-Math.random()).slice(0,3);
+        document.getElementById('mission-list').innerHTML = shuf.map(m=>`<div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.75rem;"><span>⬜ ${m.n}</span><button onclick="addM('${m.n}')" style="background:var(--bot-glow); border:none; padding:3px 6px; border-radius:4px; font-weight:900; font-size:0.5rem;">SYNC</button></div>`).join('');
+    }
+
+    renderCal(); renderL(); initMission();
 </script>
 </body>
 </html>

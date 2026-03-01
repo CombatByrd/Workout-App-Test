@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronBot Companion</title>
+    <title>IronBot: Protocol Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,55 +14,45 @@
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 120px; overflow-x: hidden; }
         .container { width: 100%; max-width: 450px; margin: auto; padding: 20px; box-sizing: border-box; }
 
-        /* --- THE ROBOT AVATAR --- */
-        .bot-container { height: 200px; display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 10px; }
-        .bot { width: 100px; height: 100px; background: #30363d; border: 4px solid var(--bot-glow); border-radius: 30px; position: relative; animation: float 3s ease-in-out infinite; box-shadow: 0 0 20px rgba(0,255,204,0.3); z-index: 2; transition: 0.5s; }
-        .bot-eyes { display: flex; justify-content: space-around; width: 60px; margin: 30px auto; }
-        .eye { width: 12px; height: 12px; background: var(--bot-glow); border-radius: 50%; transition: 0.3s; box-shadow: 0 0 10px var(--bot-glow); }
+        /* --- THE ROBOT --- */
+        .bot-container { height: 180px; display: flex; justify-content: center; align-items: center; position: relative; margin-top: 10px; }
+        .bot { width: 90px; height: 90px; background: #30363d; border: 4px solid var(--bot-glow); border-radius: 28px; position: relative; animation: float 3s ease-in-out infinite; box-shadow: 0 0 20px rgba(0,255,204,0.2); transition: 0.5s; }
+        .bot-eyes { display: flex; justify-content: space-around; width: 50px; margin: 25px auto; }
+        .eye { width: 10px; height: 10px; background: var(--bot-glow); border-radius: 50%; box-shadow: 0 0 10px var(--bot-glow); transition: 0.3s; }
+        .bot.resting { border-color: var(--rest); animation: sleep 4s ease-in-out infinite; }
+        .bot.resting .eye { height: 2px; margin-top: 4px; background: var(--rest); box-shadow: 0 0 5px var(--rest); }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        @keyframes sleep { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(0.95); opacity: 1; } }
+        .bot-speech { position: absolute; top: 0; right: 5%; background: white; color: black; padding: 8px 12px; border-radius: 18px 18px 18px 0; font-size: 0.7rem; font-weight: 900; max-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10; }
+
+        /* --- UI CARDS --- */
+        .glass-card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08); }
+        h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 12px; }
         
-        /* Bot States */
-        .bot.resting { border-color: var(--rest); box-shadow: 0 0 20px rgba(121, 192, 255, 0.4); animation: sleep 4s ease-in-out infinite; }
-        .bot.resting .eye { height: 2px; border-radius: 2px; margin-top: 5px; box-shadow: 0 0 5px var(--rest); background: var(--rest); }
-        .bot.working { transform: scale(1.1); border-color: var(--bright-green); }
+        /* DAILY MISSION */
+        .mission-item { display: flex; align-items: center; background: #0d1117; padding: 10px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid #333; transition: 0.3s; }
+        .mission-item.done { border-left-color: var(--bright-green); opacity: 0.6; }
+        .check-btn { margin-right: 12px; width: 20px; height: 20px; border-radius: 6px; border: 2px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; }
+        .mission-item.done .check-btn { background: var(--bright-green); border-color: var(--bright-green); color: black; }
 
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        @keyframes sleep { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(0.92); opacity: 1; } }
-
-        .bot-speech { position: absolute; top: 10px; right: 10%; background: white; color: black; padding: 8px 15px; border-radius: 18px 18px 18px 0; font-size: 0.75rem; font-weight: 800; max-width: 160px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 3; }
-
-        /* --- UI COMPONENTS --- */
-        .glass-card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 15px; }
+        /* TIMER & LOGS */
+        .timer-display { font-size: 3.5rem; font-weight: 900; color: var(--rest); text-align: center; font-family: monospace; margin: 10px 0; }
+        .btn-cyber { width: 100%; padding: 14px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-family: 'Outfit'; font-size: 0.8rem; }
+        .btn-primary { background: var(--primary); color: white; margin-top: 10px; }
+        .btn-sync { background: var(--bot-glow); color: black; padding: 6px 10px; border-radius: 8px; font-size: 0.6rem; float: right; font-weight: 900; border: none; cursor: pointer; }
         
-        .cooldown-timer { text-align: center; background: rgba(121, 192, 255, 0.05); border-radius: 24px; padding: 20px; border: 1px solid rgba(121, 192, 255, 0.2); }
-        .timer-display { font-size: 4rem; font-weight: 900; color: var(--rest); font-variant-numeric: tabular-nums; line-height: 1; margin: 10px 0; }
-
-        .btn-cyber { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; font-family: 'Outfit'; }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(88,166,255,0.3); }
-        .btn-cooldown { background: var(--rest); color: white; }
-        .btn-cooldown.stop { background: var(--danger); }
-
-        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 14px; border-radius: 14px; width: 100%; box-sizing: border-box; margin-bottom: 12px; font-family: 'Outfit'; font-size: 1rem; }
+        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px; font-family: 'Outfit'; }
         
-        .mode-pill { display: flex; background: #0d1117; padding: 5px; border-radius: 14px; margin-bottom: 15px; border: 1px solid #30363d; }
-        .mode-btn { flex: 1; padding: 10px; border: none; background: none; color: #666; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; }
-        .mode-btn.active { background: var(--card); color: var(--bot-glow); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-
-        .nav-bar { position: fixed; bottom: 25px; left: 20px; right: 20px; background: rgba(22, 27, 34, 0.95); border-radius: 30px; height: 75px; display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; }
-        .nav-item { color: #8b949e; text-decoration: none; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; background: none; border: none; font-weight: 600; }
+        .nav-bar { position: fixed; bottom: 20px; left: 15px; right: 15px; background: rgba(22, 27, 34, 0.96); border-radius: 28px; height: 75px; display: flex; justify-content: space-around; align-items: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 1000; }
+        .nav-item { color: #8b949e; background: none; border: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; font-weight: 600; }
         .nav-item.active { color: var(--bot-glow); }
-        .nav-icon { font-size: 1.5rem; margin-bottom: 4px; }
 
-        /* Summary Stats */
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .stat-card { background: #0d1117; padding: 15px; border-radius: 18px; text-align: center; border: 1px solid #30363d; }
-        .stat-card small { font-size: 0.6rem; color: #8b949e; display: block; margin-bottom: 5px; }
-        .stat-card span { font-size: 1.2rem; font-weight: 800; color: var(--bright-green); }
-
-        #weightGraph { width: 100%; height: 140px; margin-top: 10px; }
-        .page { display: none; animation: fadeIn 0.4s ease; }
+        .lib-card { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 15px; margin-bottom: 15px; }
+        .video-placeholder { width: 100%; height: 140px; background: #000; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; border: 1px solid var(--primary); font-size: 0.6rem; color: var(--primary); letter-spacing: 2px; }
+        
+        .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -71,171 +61,195 @@
     
     <section id="page-today" class="page active">
         <div class="bot-container">
-            <div id="iron-bot" class="bot">
-                <div class="bot-eyes">
-                    <div id="eye-l" class="eye"></div>
-                    <div id="eye-r" class="eye"></div>
-                </div>
-            </div>
-            <div class="bot-speech" id="bot-message">SYSTEMS ONLINE. READY TO WORK?</div>
+            <div id="iron-bot" class="bot"><div class="bot-eyes"><div class="eye"></div><div class="eye"></div></div></div>
+            <div class="bot-speech" id="bot-message">HELLO! READY FOR TODAY'S MISSION?</div>
         </div>
 
-        <div class="cooldown-timer">
-            <h3>Cooldown Protocol</h3>
+        <div class="glass-card">
+            <h3>Daily Protocol</h3>
+            <div id="mission-list"></div>
+        </div>
+
+        <div class="glass-card">
+            <h3>Cooldown Timer</h3>
             <div class="timer-display" id="timer-display">01:30</div>
-            <div style="display:flex; gap:10px;">
-                <button id="timer-toggle" class="btn-cyber btn-cooldown" onclick="toggleTimer()">Start Cooldown</button>
-                <button class="btn-cyber" style="width:70px; background:#30363d; color:white;" onclick="adjustTimer(30)">+30s</button>
-            </div>
+            <button id="timer-btn" class="btn-cyber" style="background:var(--rest); color:white" onclick="toggleTimer()">Activate Rest</button>
         </div>
 
-        <div class="glass-card" style="margin-top:20px;">
-            <h3>Activity Logger</h3>
-            <div class="mode-pill">
-                <button id="m-weights" class="mode-btn active" onclick="setMode('weights')">Weights</button>
-                <button id="m-cardio" class="mode-btn" onclick="setMode('cardio')">Cardio</button>
-            </div>
-            
-            <input id="ex-name" placeholder="Activity (e.g. Squats, Run)">
-            
-            <div id="input-weights" style="display:flex; gap:10px;">
+        <div class="glass-card">
+            <h3>Log Activity</h3>
+            <input id="ex-name" placeholder="Exercise Name">
+            <div style="display:flex; gap:10px;">
                 <input type="number" id="ex-sets" placeholder="Sets">
                 <input type="number" id="ex-reps" placeholder="Reps">
             </div>
-            
-            <div id="input-cardio" style="display:none; gap:10px;">
-                <input type="text" id="ex-time" placeholder="Time (min)">
-                <input type="text" id="ex-dist" placeholder="Dist (mi)">
-            </div>
-            
-            <button class="btn-cyber btn-primary" onclick="handleLog()">Log Session</button>
+            <button class="btn-cyber btn-primary" onclick="handleLog()">Upload to History</button>
         </div>
+    </section>
 
-        <div id="today-logs"></div>
+    <section id="page-lib" class="page">
+        <h2>Encyclopedia</h2>
+        <input type="text" id="lib-search" placeholder="Search movements..." oninput="renderLibrary()">
+        <div id="lib-list"></div>
     </section>
 
     <section id="page-history" class="page">
-        <h2 style="margin-bottom:20px;">Biometric History</h2>
-        
+        <h2>Analytics</h2>
         <div class="glass-card">
-            <h3>Weight Trend</h3>
-            <canvas id="weightGraph"></canvas>
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <small>CURRENT</small>
-                    <span id="cur-w">--</span>
-                </div>
-                <div class="stat-card">
-                    <small>GOAL</small>
-                    <span id="cur-g" style="color:var(--fuel)">--</span>
-                </div>
+            <h3 style="color:var(--bright-green)">Weight Trend</h3>
+            <canvas id="weightGraph" style="width:100%; height:120px;"></canvas>
+            <div style="display:flex; justify-content:space-around; margin-top:15px;">
+                <div style="text-align:center"><small>WEIGHT</small><br><strong id="cur-w">--</strong></div>
+                <div style="text-align:center"><small>CAL GOAL</small><br><strong id="cur-g" style="color:var(--fuel)">--</strong></div>
             </div>
         </div>
-
         <div class="glass-card">
             <h3>Update Vitals</h3>
             <div style="display:flex; gap:10px;">
-                <input type="number" id="vit-w" placeholder="Weight">
-                <input type="number" id="vit-g" placeholder="Cal Goal">
+                <input type="number" id="vit-w" placeholder="Weight (lbs)">
+                <input type="number" id="vit-g" placeholder="Daily Cals">
             </div>
-            <button class="btn-cyber btn-primary" onclick="updateVitals()">Sync Vitals</button>
+            <button class="btn-cyber btn-primary" onclick="updateVitals()">Save Changes</button>
         </div>
-
         <div id="history-details"></div>
     </section>
 </div>
 
 <nav class="nav-bar">
-    <button class="nav-item active" onclick="showPage('today', this)">
-        <span class="nav-icon">🤖</span>Today
-    </button>
-    <button class="nav-item" onclick="showPage('history', this)">
-        <span class="nav-icon">📊</span>History
-    </button>
+    <button class="nav-item active" onclick="showPage('today', this)"><span>🤖</span>Today</button>
+    <button class="nav-item" onclick="showPage('lib', this)"><span>📚</span>Library</button>
+    <button class="nav-item" onclick="showPage('history', this)"><span>📊</span>Stats</button>
 </nav>
 
 <script>
-    let timerSec = 90, timerRunning = false, timerInt, trackMode = 'weights';
-    const botMsg = document.getElementById('bot-message');
-    const ironBot = document.getElementById('iron-bot');
+    const db = [
+        { name: "DB Bicep Curls", muscle: "Arms", info: "Focus on the squeeze at the top." },
+        { name: "Goblet Squats", muscle: "Legs", info: "Keep your heels glued to the floor." },
+        { name: "Shoulder Press", muscle: "Shoulders", info: "Don't arch your lower back." },
+        { name: "Push Ups", muscle: "Chest", info: "Keep your core tight and body straight." },
+        { name: "Plank", muscle: "Core", info: "Hold as long as possible with good form." },
+        { name: "Hammer Curls", muscle: "Arms", info: "Keep palms facing inward." }
+    ];
 
+    let timerSec = 90, timerRunning = false, timerInt;
+    let missions = [];
+
+    // --- PROTOCOL (DAILY MISSION) LOGIC ---
+    function initDailyMission() {
+        const saved = JSON.parse(localStorage.getItem('ironBotMissions'));
+        const today = new Date().toLocaleDateString();
+        
+        if(saved && saved.date === today) {
+            missions = saved.data;
+        } else {
+            // Pick 3 random exercises
+            const shuffled = [...db].sort(() => 0.5 - Math.random());
+            missions = shuffled.slice(0, 3).map(ex => ({ name: ex.name, done: false }));
+            localStorage.setItem('ironBotMissions', JSON.stringify({ date: today, data: missions }));
+        }
+        renderMissions();
+    }
+
+    function renderMissions() {
+        const list = document.getElementById('mission-list');
+        list.innerHTML = missions.map((m, i) => `
+            <div class="mission-item ${m.done ? 'done' : ''}">
+                <div class="check-btn" onclick="toggleMission(${i})">${m.done ? '✓' : ''}</div>
+                <div style="font-size:0.85rem; font-weight:600;">${m.name}</div>
+            </div>
+        `).join('');
+        
+        const allDone = missions.every(m => m.done);
+        if(allDone) document.getElementById('bot-message').innerText = "MISSION ACCOMPLISHED! ALL SYSTEMS OPTIMIZED.";
+    }
+
+    function toggleMission(i) {
+        missions[i].done = !missions[i].done;
+        const today = new Date().toLocaleDateString();
+        localStorage.setItem('ironBotMissions', JSON.stringify({ date: today, data: missions }));
+        renderMissions();
+        if(missions[i].done) {
+            document.getElementById('iron-bot').classList.add('working');
+            setTimeout(() => document.getElementById('iron-bot').classList.remove('working'), 500);
+        }
+    }
+
+    // --- NAVIGATION & CORE ---
     function showPage(p, btn) {
         document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(ni => ni.classList.remove('active'));
         document.getElementById('page-'+p).classList.add('active');
         btn.classList.add('active');
         if(p === 'history') renderHistory();
+        if(p === 'lib') renderLibrary();
     }
 
-    // --- COOLDOWN LOGIC ---
     function toggleTimer() {
-        const btn = document.getElementById('timer-toggle');
+        const bot = document.getElementById('iron-bot');
+        const btn = document.getElementById('timer-btn');
         if(timerRunning) {
             clearInterval(timerInt);
             timerRunning = false;
-            ironBot.classList.remove('resting');
-            botMsg.innerText = "COOLDOWN INTERRUPTED. STAY SHARP.";
-            btn.innerText = "Start Cooldown";
-            btn.classList.remove('stop');
+            bot.classList.remove('resting');
+            btn.innerText = "Activate Rest";
+            btn.style.background = "var(--rest)";
         } else {
             timerRunning = true;
-            ironBot.classList.add('resting');
-            botMsg.innerText = "RECHARGING SYSTEMS... DEEP BREATHS.";
+            bot.classList.add('resting');
             btn.innerText = "Stop Timer";
-            btn.classList.add('stop');
+            btn.style.background = "var(--danger)";
             timerInt = setInterval(() => {
                 timerSec--;
                 updateTimerDisplay();
                 if(timerSec <= 0) {
                     clearInterval(timerInt);
                     timerRunning = false;
-                    ironBot.classList.remove('resting');
-                    botMsg.innerText = "POWER RESTORED. NEXT SET!";
-                    btn.innerText = "Start Cooldown";
-                    btn.classList.remove('stop');
-                    playDing();
+                    bot.classList.remove('resting');
+                    btn.innerText = "Activate Rest";
+                    btn.style.background = "var(--rest)";
+                    timerSec = 90; updateTimerDisplay();
                 }
             }, 1000);
         }
     }
 
-    function adjustTimer(amt) { timerSec += amt; updateTimerDisplay(); }
     function updateTimerDisplay() {
         let m = Math.floor(timerSec/60), s = timerSec%60;
         document.getElementById('timer-display').innerText = `${m}:${s<10?'0'+s:s}`;
     }
 
-    // --- TRACKER LOGIC ---
-    function setMode(m) {
-        trackMode = m;
-        document.getElementById('input-weights').style.display = m === 'weights' ? 'flex' : 'none';
-        document.getElementById('input-cardio').style.display = m === 'cardio' ? 'flex' : 'none';
-        document.getElementById('m-weights').classList.toggle('active', m === 'weights');
-        document.getElementById('m-cardio').classList.toggle('active', m === 'cardio');
-    }
-
     function handleLog() {
-        ironBot.classList.add('working');
-        botMsg.innerText = "DATA RECEIVED. EXCELLENT FORM!";
-        setTimeout(() => ironBot.classList.remove('working'), 800);
+        const name = document.getElementById('ex-name').value;
+        const sets = document.getElementById('ex-sets').value;
+        const reps = document.getElementById('ex-reps').value;
+        if(!name) return;
         
         const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
-        const entry = {
-            id: Date.now(),
-            date: new Date().toLocaleDateString(),
-            name: document.getElementById('ex-name').value || "Activity",
-            isCardio: trackMode === 'cardio'
-        };
-        if(trackMode === 'weights') {
-            entry.sets = document.getElementById('ex-sets').value;
-            entry.reps = document.getElementById('ex-reps').value;
-        } else {
-            entry.time = document.getElementById('ex-time').value;
-            entry.dist = document.getElementById('ex-dist').value;
-        }
-        logs.push(entry);
+        logs.push({ id: Date.now(), date: new Date().toLocaleDateString(), name, sets, reps });
         localStorage.setItem('ultraLogs', JSON.stringify(logs));
-        renderHistory();
+        
+        document.getElementById('bot-message').innerText = "LOG RECEIVED. UPLOADING DATA...";
+        document.getElementById('ex-name').value = '';
+        document.getElementById('ex-sets').value = '';
+        document.getElementById('ex-reps').value = '';
+    }
+
+    function renderLibrary() {
+        const q = document.getElementById('lib-search').value.toLowerCase();
+        document.getElementById('lib-list').innerHTML = db.filter(ex => ex.name.toLowerCase().includes(q)).map(ex => `
+            <div class="lib-card">
+                <button class="btn-sync" onclick="syncToBot('${ex.name}')">SYNC</button>
+                <div class="video-placeholder">▶ ENCRYPTED VIDEO FEED</div>
+                <strong>${ex.name}</strong> <small style="color:var(--primary)">[${ex.muscle}]</small>
+                <p style="font-size:0.75rem; color:#8b949e; margin-top:8px;">${ex.info}</p>
+            </div>
+        `).join('');
+    }
+
+    function syncToBot(name) {
+        showPage('today', document.querySelector('.nav-item:first-child'));
+        document.getElementById('ex-name').value = name;
+        document.getElementById('bot-message').innerText = `READY FOR ${name.toUpperCase()}!`;
     }
 
     function updateVitals() {
@@ -247,59 +261,34 @@
             localStorage.setItem('ultraVitals', JSON.stringify(v));
         }
         if(g) localStorage.setItem('calGoal', g);
-        botMsg.innerText = "BIOMETRICS UPDATED. SYNC SUCCESSFUL.";
         renderHistory();
     }
 
     function renderHistory() {
         const logs = JSON.parse(localStorage.getItem('ultraLogs') || '[]');
         const vitals = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
-        const goal = localStorage.getItem('calGoal') || "2500";
-        
-        // Update Stats
         const dates = Object.keys(vitals).sort((a,b) => new Date(b) - new Date(a));
         document.getElementById('cur-w').innerText = dates.length ? vitals[dates[0]].weight + " lbs" : "--";
-        document.getElementById('cur-g').innerText = goal + " kcal";
+        document.getElementById('cur-g').innerText = (localStorage.getItem('calGoal') || "2500") + " kcal";
 
-        const html = logs.slice().reverse().map(l => `
-            <div class="glass-card" style="padding:15px; margin-bottom:12px; border-left: 4px solid ${l.isCardio ? 'var(--rest)' : 'var(--primary)'}">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <strong>${l.name}</strong><br>
-                        <small style="color:#8b949e">${l.isCardio ? `${l.time} min • ${l.dist} mi` : `${l.sets} sets • ${l.reps} reps`}</small>
-                    </div>
-                    <button onclick="deleteLog(${l.id})" style="background:none; border:none; color:var(--danger); cursor:pointer;">✕</button>
-                </div>
+        document.getElementById('history-details').innerHTML = logs.reverse().map(l => `
+            <div class="glass-card" style="padding:15px; margin-bottom:10px;">
+                <strong>${l.name}</strong><br><small>${l.sets}x${l.reps} • ${l.date}</small>
             </div>
         `).join('');
-        document.getElementById('history-details').innerHTML = html;
-        renderWeightGraph();
+        renderGraph();
     }
 
-    function deleteLog(id) {
-        let logs = JSON.parse(localStorage.getItem('ultraLogs')).filter(l => l.id !== id);
-        localStorage.setItem('ultraLogs', JSON.stringify(logs));
-        renderHistory();
-    }
-
-    function renderWeightGraph() {
+    function renderGraph() {
         const canvas = document.getElementById('weightGraph');
         const ctx = canvas.getContext('2d');
         const v = JSON.parse(localStorage.getItem('ultraVitals') || '{}');
         const data = Object.keys(v).map(d => ({ x: new Date(d), y: parseFloat(v[d].weight) })).sort((a,b) => a.x - b.x);
-        
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        if(data.length < 2) {
-            ctx.fillStyle = "#666"; ctx.font = "10px Outfit"; ctx.textAlign = "center";
-            ctx.fillText("ADD MORE WEIGHT LOGS TO SEE DATA", canvas.width/2, canvas.height/2);
-            return;
-        }
-
-        const minW = Math.min(...data.map(d => d.y)) - 2;
-        const maxW = Math.max(...data.map(d => d.y)) + 2;
-        
-        ctx.beginPath();
-        ctx.strokeStyle = "#39d353"; ctx.lineWidth = 3;
+        if(data.length < 2) return;
+        const minW = Math.min(...data.map(d => d.y)) - 1;
+        const maxW = Math.max(...data.map(d => d.y)) + 1;
+        ctx.beginPath(); ctx.strokeStyle = "#39d353"; ctx.lineWidth = 3;
         data.forEach((p, i) => {
             const x = (i / (data.length - 1)) * canvas.width;
             const y = canvas.height - ((p.y - minW) / (maxW - minW)) * canvas.height;
@@ -308,19 +297,8 @@
         ctx.stroke();
     }
 
-    function playDing() {
-        try {
-            const ctx = new AudioContext();
-            const o = ctx.createOscillator();
-            const g = ctx.createGain();
-            o.frequency.setValueAtTime(587.33, ctx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1);
-            o.connect(g); g.connect(ctx.destination);
-            o.start(); o.stop(ctx.currentTime + 1);
-        } catch(e) {}
-    }
-
-    renderHistory();
+    // Start Up
+    initDailyMission();
 </script>
 </body>
 </html>

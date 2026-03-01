@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronBot: Complete Lifecycle</title>
+    <title>IronBot: Total Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,7 +14,7 @@
         body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 110px; }
         .container { width: 100%; max-width: 450px; margin: auto; padding: 20px; box-sizing: border-box; }
 
-        /* --- IRONBOT EXPRESSIONS --- */
+        /* --- BOT VISUALS --- */
         .bot-scene { height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
         .bot-body { width: 65px; height: 65px; background: #30363d; border: 3px solid var(--bot-glow); border-radius: 20px; position: relative; animation: float 3s infinite ease-in-out; }
         .arm { width: 10px; height: 30px; background: #30363d; border: 2px solid var(--bot-glow); position: absolute; border-radius: 10px; top: 15px; transition: 0.4s; }
@@ -23,28 +23,31 @@
         .eye { width: 7px; height: 7px; background: var(--bot-glow); border-radius: 50%; box-shadow: 0 0 8px var(--bot-glow); }
         .mouth { width: 12px; height: 3px; background: var(--bot-glow); margin: 5px auto; border-radius: 10px; transition: 0.2s; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-        
         .resting .eye { height: 1px; } .working .mouth { height: 8px; width: 8px; border-radius: 50%; }
-        .working .arm-l { transform: rotate(130deg); } .working .arm-r { transform: rotate(-130deg); }
-
+        .working .arm-l { transform: rotate(130deg); } .working .arm-r { transform: rotate(-140deg); }
         .bubble { position: absolute; top: 0; right: 0; background: white; color: black; padding: 8px 12px; border-radius: 15px 15px 15px 0; font-size: 0.7rem; font-weight: 900; max-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
         /* --- CALENDAR --- */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
-        .cal-day { aspect-ratio: 1; background: #0d1117; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #444; position: relative; }
-        .cal-day.active { color: #fff; border: 1px solid #333; }
-        .cal-day.logged { background: rgba(57, 211, 83, 0.2); border: 1px solid var(--bright-green); color: var(--bright-green); }
+        .cal-day { aspect-ratio: 1; background: #0d1117; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; cursor: pointer; border: 1px solid #1f242b; }
+        .cal-day.logged { background: rgba(57, 211, 83, 0.2); border-color: var(--bright-green); color: var(--bright-green); }
+        .cal-day.selected { border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
 
-        /* --- UI --- */
+        /* --- CARDS & UI --- */
         .glass-card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border-radius: 20px; padding: 18px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.08); }
-        h3 { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 10px; }
-        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; margin-bottom: 8px; }
-        .btn-cyber { padding: 12px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; width: 100%; }
+        h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: #8b949e; margin-bottom: 10px; }
+        .btn-cyber { padding: 12px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; width: 100%; transition: 0.2s; }
+        .btn-sync-small { background: var(--bot-glow); color: #000; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; cursor: pointer; }
+        input { background: #0d1117; border: 1px solid #30363d; color: white; padding: 10px; border-radius: 10px; width: 100%; box-sizing: border-box; margin-bottom: 8px; }
         
-        .nav-bar { position: fixed; bottom: 15px; left: 10px; right: 10px; background: #161b22; border-radius: 25px; height: 65px; display: flex; justify-content: space-around; align-items: center; border: 1px solid #333; }
-        .nav-item { color: #8b949e; background: none; border: none; font-size: 0.6rem; display: flex; flex-direction: column; align-items: center; }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; border-bottom: 1px solid #1f242b; padding-bottom: 4px; }
+        .stat-val { color: var(--bot-glow); font-weight: 800; }
+
+        .nav-bar { position: fixed; bottom: 15px; left: 10px; right: 10px; background: #161b22; border-radius: 25px; height: 65px; display: flex; justify-content: space-around; align-items: center; border: 1px solid #333; z-index: 1000; }
+        .nav-item { color: #8b949e; background: none; border: none; font-size: 0.6rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .nav-item.active { color: var(--bot-glow); }
-        .page { display: none; } .page.active { display: block; }
+        .page { display: none; } .page.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -57,19 +60,20 @@
                 <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
                 <div class="mouth"></div>
             </div>
-            <div class="bubble" id="bot-speech">AWAITING INPUT...</div>
+            <div class="bubble" id="bot-speech">SYNC THE CALENDAR, HUMAN.</div>
         </div>
 
         <div class="glass-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3>Activity Calendar</h3>
-                <span id="cal-month" style="font-size:0.6rem; font-weight:800; color:var(--primary)"></span>
+                <h3>Command Calendar</h3>
+                <span id="cal-mo" style="font-size:0.6rem; color:var(--primary); font-weight:900;"></span>
             </div>
             <div class="cal-grid" id="calendar"></div>
+            <p id="selected-date-info" style="font-size:0.6rem; color:#888; margin-top:10px; text-align:center;">Selected: Today</p>
         </div>
 
         <div class="glass-card">
-            <h3>Protocol: Mission of the Day</h3>
+            <h3>Daily Mission Protocol</h3>
             <div id="mission-list"></div>
         </div>
 
@@ -85,22 +89,39 @@
         </div>
 
         <div class="glass-card">
+            <h3>Log Entry</h3>
             <div style="display:flex; gap:5px; margin-bottom:8px;">
-                <button id="m-w" class="btn-cyber" style="font-size:0.5rem; background:var(--card); color:var(--bot-glow)" onclick="setM('w')">Weights</button>
-                <button id="m-c" class="btn-cyber" style="font-size:0.5rem; background:none; color:#666" onclick="setM('c')">Cardio</button>
+                <button id="m-w" class="btn-cyber" style="font-size:0.55rem; background:var(--card); color:var(--bot-glow)" onclick="setM('w')">Weights</button>
+                <button id="m-c" class="btn-cyber" style="font-size:0.55rem; background:none; color:#666" onclick="setM('c')">Cardio</button>
             </div>
-            <input id="ex-n" placeholder="Exercise Name">
-            <div id="w-in" style="display:flex; gap:8px;"><input type="number" id="ex-s" placeholder="Sets"><input type="number" id="ex-r" placeholder="Reps"></div>
+            <input id="ex-n" placeholder="Exercise / Activity Name">
+            <div id="w-in" style="display:flex; gap:8px;"><input type="number" id="ex-s" placeholder="Sets"><input type="number" id="ex-r" placeholder="Reps"><input type="number" id="ex-lb" placeholder="Lbs"></div>
             <div id="c-in" style="display:none; gap:8px;"><input type="number" id="ex-t" placeholder="Min"><input type="number" id="ex-d" placeholder="Miles"></div>
-            <button class="btn-cyber" style="background:var(--primary); color:white; margin-top:5px;" onclick="logD()">Sync Session</button>
+            <button class="btn-cyber" style="background:var(--primary); color:white; margin-top:5px;" onclick="logD()">Sync Data</button>
+        </div>
+
+        <div class="glass-card">
+            <h3>Daily Fueling</h3>
+            <div style="display:flex; gap:8px;">
+                <input type="number" id="fuel-in" placeholder="Calories In">
+                <button class="btn-cyber" style="width:100px; background:var(--fuel); color:#000;" onclick="saveFuel()">Log Fuel</button>
+            </div>
         </div>
     </section>
 
     <section id="page-stats" class="page">
-        <h2>Biometrics</h2>
+        <h2>Mission Intel</h2>
         <div class="glass-card">
             <h3>Weight Trend</h3>
             <canvas id="wGraph" style="width:100%; height:140px;"></canvas>
+        </div>
+        <div class="glass-card">
+            <h3>Core Metrics</h3>
+            <div class="stat-row"><span>Total Volume</span><span class="stat-val" id="stat-vol">0 lbs</span></div>
+            <div class="stat-row"><span>Monthly Distance</span><span class="stat-val" id="stat-mi">0 mi</span></div>
+            <div class="stat-row"><span>1 Mile PR</span><span class="stat-val" id="pr-1">--</span></div>
+            <div class="stat-row"><span>5K PR</span><span class="stat-val" id="pr-5">--</span></div>
+            <div class="stat-row"><span>10K PR</span><span class="stat-val" id="pr-10">--</span></div>
         </div>
         <div id="hist-list"></div>
     </section>
@@ -110,14 +131,12 @@
         <input type="text" placeholder="Search movements..." oninput="renderL(this.value)">
         <div id="lib-list"></div>
     </section>
-
+    
     <section id="page-set" class="page">
         <h2>Calibration</h2>
         <div class="glass-card">
-            <h3>Daily Fuel & Weight</h3>
-            <label style="font-size:0.6rem; color:#888;">Weight (lbs)</label><input type="number" id="set-w">
-            <label style="font-size:0.6rem; color:#888;">Calories Consumed</label><input type="number" id="set-f">
-            <button class="btn-cyber" style="background:var(--primary); color:white;" onclick="saveS()">Update</button>
+            <label>Current Weight (lbs)</label><input type="number" id="set-w">
+            <button class="btn-cyber" style="background:var(--primary); color:white;" onclick="saveSet()">Update Weight</button>
         </div>
     </section>
 </div>
@@ -131,17 +150,16 @@
 
 <script>
     const db = [
-        {n:"DB Goblet Squat", m:"Legs", i:"Cup the DB at your chest. Sit deep into the hips."},
-        {n:"DB Chest Press", m:"Chest", i:"Drive weights up from shoulder width. Don't clank them."},
-        {n:"DB One Arm Row", m:"Back", i:"Support yourself on a bench. Pull DB to hip."},
-        {n:"Dumbbell Curl", m:"Arms", i:"Keep elbows pinned. Control the descent."},
-        {n:"DB Shoulder Press", m:"Shoulders", i:"Press from ear-height to full extension overhead."},
-        {n:"Running", m:"Cardio", i:"Maintain a steady heart rate."}
+        {n:"DB Goblet Squat", m:"Legs", i:"Cup DB at chest height. Keep heels down."},
+        {n:"DB Bench Press", m:"Chest", i:"Drive DBs from shoulder width to center."},
+        {n:"DB Single Row", m:"Back", i:"Pull DB to hip. Keep back flat."},
+        {n:"DB Hammer Curl", m:"Arms", i:"Palms inward. Control the weight."},
+        {n:"DB Lateral Raise", m:"Shoulders", i:"Raise arms to the side, slight elbow bend."}
     ];
 
-    let mode = 'w', tSec = 90, tRun = false, tInt;
+    let mode = 'w', tSec = 90, tRun = false, tInt, selectedDate = new Date().toLocaleDateString();
 
-    function speak(text) { document.getElementById('bot-speech').innerText = text; }
+    function speak(t) { document.getElementById('bot-speech').innerText = t; }
 
     function showP(p, b) {
         document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
@@ -151,24 +169,31 @@
         if(p==='stats') renderStats();
     }
 
-    // --- CALENDAR ---
+    // --- FUNCTIONAL CALENDAR ---
     function renderCal() {
         const cal = document.getElementById('calendar');
         const now = new Date();
         const daysInMo = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
         const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
-        const loggedDates = logs.map(l => l.d);
         
-        document.getElementById('cal-month').innerText = now.toLocaleString('default', { month: 'long' }).toUpperCase();
+        document.getElementById('cal-mo').innerText = now.toLocaleString('default', { month: 'long' }).toUpperCase();
         cal.innerHTML = '';
         for(let i=1; i<=daysInMo; i++) {
             const dateStr = new Date(now.getFullYear(), now.getMonth(), i).toLocaleDateString();
-            const isLogged = loggedDates.includes(dateStr);
-            cal.innerHTML += `<div class="cal-day active ${isLogged?'logged':''}">${i}</div>`;
+            const isLogged = logs.some(l => l.d === dateStr);
+            const isSelected = selectedDate === dateStr;
+            cal.innerHTML += `<div class="cal-day active ${isLogged?'logged':''} ${isSelected?'selected':''}" onclick="selectDate('${dateStr}')">${i}</div>`;
         }
     }
 
-    // --- PROTOCOL ---
+    function selectDate(d) {
+        selectedDate = d;
+        document.getElementById('selected-date-info').innerText = `Target Date: ${d}`;
+        renderCal();
+        speak(`SWITCHING TO ${d}.`);
+    }
+
+    // --- MISSION SYNC ---
     function initM() {
         let missions = JSON.parse(localStorage.getItem('currMissions'));
         const today = new Date().toLocaleDateString();
@@ -178,60 +203,80 @@
             localStorage.setItem('currMissions', JSON.stringify(missions));
         }
         document.getElementById('mission-list').innerHTML = missions.data.map((m,i)=>`
-            <div style="font-size:0.8rem; margin-bottom:5px; color:${m.done?'var(--bright-green)':'#fff'}">
-                ${m.done?'✅':'⬜'} ${m.n}
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:0.8rem;">
+                <span>${m.done?'✅':'⬜'} ${m.n}</span>
+                <button class="btn-sync-small" onclick="addMissionToLog('${m.n}', ${i})">ADD TO LOG</button>
             </div>
         `).join('');
     }
 
-    // --- ACTIONS ---
+    function addMissionToLog(name, index) {
+        document.getElementById('ex-n').value = name;
+        setM(name.includes("Run") ? 'c' : 'w');
+        speak("MISSION ADDED TO TRACKER.");
+    }
+
+    // --- LOGGING ---
     function setM(m) { 
         mode=m; document.getElementById('w-in').style.display=m==='w'?'flex':'none'; document.getElementById('c-in').style.display=m==='c'?'flex':'none'; 
-        speak(m==='w'?"READY TO PUMP SOME IRON?":"PREPARING CARDIO ENGINES.");
     }
-    
-    function adjT(v) { tSec = Math.max(0, tSec+v); updateT(); }
-    function toggleT() {
-        const sc = document.getElementById('bot-scene');
-        if(tRun) { clearInterval(tInt); tRun=false; sc.classList.remove('resting'); speak("REST INTERRUPTED."); }
-        else { 
-            tRun=true; sc.classList.add('resting'); speak("INITIATING RECHARGE...");
-            tInt = setInterval(() => { tSec--; updateT(); if(tSec<=0) { toggleT(); speak("SYSTEMS RESTORED!"); } }, 1000);
-        }
-    }
-    function updateT() { let m=Math.floor(tSec/60), s=tSec%60; document.getElementById('timer-display').innerText = `${m}:${s<10?'0'+s:s}`; }
 
     function logD() {
         const n = document.getElementById('ex-n').value; if(!n) return;
         const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
-        logs.push({id:Date.now(), d:new Date().toLocaleDateString(), n, c:mode==='c', s:document.getElementById('ex-s').value, r:document.getElementById('ex-r').value, t:document.getElementById('ex-t').value, m:document.getElementById('ex-d').value});
+        const entry = {id:Date.now(), d:selectedDate, n, c:mode==='c', 
+                      s:document.getElementById('ex-s').value, r:document.getElementById('ex-r').value, lb:document.getElementById('ex-lb').value,
+                      t:document.getElementById('ex-t').value, m:document.getElementById('ex-d').value};
+        logs.push(entry);
         localStorage.setItem('uLogs', JSON.stringify(logs));
         document.getElementById('bot-scene').classList.add('working');
-        speak(mode==='w' ? "LIFT DETECTED. FORM: OPTIMAL." : "MILEAGE RECORDED. GO GO GO!");
-        setTimeout(()=> { document.getElementById('bot-scene').classList.remove('working'); renderCal(); }, 1200);
+        speak("DATA COMMITTED.");
+        setTimeout(()=> { document.getElementById('bot-scene').classList.remove('working'); renderCal(); }, 1000);
     }
 
-    function saveS() {
-        const w = document.getElementById('set-w').value, f = document.getElementById('set-f').value, dt = new Date().toLocaleDateString();
-        const v = JSON.parse(localStorage.getItem('uVit')||'{}'); if(!v[dt]) v[dt]={};
-        if(w) { v[dt].w=w; speak("BIOMETRICS SYNCED."); }
-        if(f) { v[dt].f=f; speak(f > 2500 ? "FUEL LEVELS HIGH!" : "ENERGY CONSUMED."); }
+    function saveFuel() {
+        const cal = document.getElementById('fuel-in').value; if(!cal) return;
+        const v = JSON.parse(localStorage.getItem('uVit')||'{}');
+        if(!v[selectedDate]) v[selectedDate] = {};
+        v[selectedDate].f = cal;
         localStorage.setItem('uVit', JSON.stringify(v));
+        speak(`${cal} CALORIES DIGESTED.`);
     }
 
-    function renderL(q="") {
-        document.getElementById('lib-list').innerHTML = db.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).map(x=>`
-            <div class="glass-card">
-                <div style="width:100%; height:80px; background:#000; border:1px solid var(--primary); margin-bottom:10px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:0.5rem;">[VIDEO FEED: ${x.n}]</div>
-                <strong>${x.n}</strong><br><small>${x.i}</small><br>
-                <button onclick="sync('${x.n}')" style="margin-top:10px; background:var(--bot-glow); border:none; border-radius:5px; font-weight:800; padding:5px;">SYNC</button>
-            </div>
-        `).join('');
+    function saveSet() {
+        const w = document.getElementById('set-w').value; if(!w) return;
+        const v = JSON.parse(localStorage.getItem('uVit')||'{}');
+        if(!v[selectedDate]) v[selectedDate] = {};
+        v[selectedDate].w = w;
+        localStorage.setItem('uVit', JSON.stringify(v));
+        speak("MASS REGISTERED.");
     }
-    function sync(n) { showP('today', document.querySelector('.nav-item')); document.getElementById('ex-n').value=n; }
 
+    // --- ANALYTICS ---
     function renderStats() {
         const logs = JSON.parse(localStorage.getItem('uLogs')||'[]');
+        let totalVol = 0, totalDist = 0;
+        let p1 = Infinity, p5 = Infinity, p10 = Infinity;
+
+        logs.forEach(l => {
+            if(!l.c) {
+                totalVol += (parseInt(l.s)||0) * (parseInt(l.r)||0) * (parseInt(l.lb)||0);
+            } else {
+                const dist = parseFloat(l.m)||0;
+                totalDist += dist;
+                const time = parseFloat(l.t)||0;
+                if(dist >= 1 && dist < 2) p1 = Math.min(p1, time);
+                if(dist >= 3.1 && dist < 4) p5 = Math.min(p5, time);
+                if(dist >= 6.2) p10 = Math.min(p10, time);
+            }
+        });
+
+        document.getElementById('stat-vol').innerText = totalVol.toLocaleString() + " lbs";
+        document.getElementById('stat-mi').innerText = totalDist.toFixed(1) + " mi";
+        document.getElementById('pr-1').innerText = p1 === Infinity ? "--" : p1 + "m";
+        document.getElementById('pr-5').innerText = p5 === Infinity ? "--" : p5 + "m";
+        document.getElementById('pr-10').innerText = p10 === Infinity ? "--" : p10 + "m";
+
         document.getElementById('hist-list').innerHTML = logs.reverse().slice(0,5).map(l => `<div class="glass-card" style="font-size:0.7rem;">${l.n} - ${l.d}</div>`).join('');
         renderG();
     }
@@ -244,6 +289,18 @@
         const minW = Math.min(...data.map(d=>d.y))-1, maxW = Math.max(...data.map(d=>d.y))+1;
         ctx.beginPath(); ctx.strokeStyle="#39d353"; ctx.lineWidth=3;
         data.forEach((p,i)=>{ const x=(i/(data.length-1))*c.width, y=c.height-((p.y-minW)/(maxW-minW))*c.height; if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke();
+    }
+
+    // --- TIMER & LIB ---
+    function adjT(v) { tSec = Math.max(0, tSec+v); updateT(); }
+    function toggleT() {
+        const sc = document.getElementById('bot-scene');
+        if(tRun) { clearInterval(tInt); tRun=false; sc.classList.remove('resting'); }
+        else { tRun=true; sc.classList.add('resting'); tInt = setInterval(() => { tSec--; updateT(); if(tSec<=0) toggleT(); }, 1000); }
+    }
+    function updateT() { let m=Math.floor(tSec/60), s=tSec%60; document.getElementById('timer-display').innerText = `${m}:${s<10?'0'+s:s}`; }
+    function renderL(q="") {
+        document.getElementById('lib-list').innerHTML = db.filter(x=>x.n.toLowerCase().includes(q.toLowerCase())).map(x=>`<div class="glass-card"><strong>${x.n}</strong><br><small>${x.i}</small><br><button class="btn-sync-small" onclick="addMissionToLog('${x.n}',0)">SYNC</button></div>`).join('');
     }
 
     renderCal(); initM(); renderL();
